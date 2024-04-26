@@ -63,20 +63,30 @@ namespace AutoTele
             //    Console.WriteLine(ex.Message);
             //}
 
-            // tap in arrow icon 
-            try
-            {
-                Bitmap screen = KAutoHelper.ADBHelper.ScreenShoot(deviceID);
-                Point p = (Point)ToolHeper.FindOutPoint(screen, /*arrow*/_checked, 0.9);
-                if (p != null)
-                {
-                    KAutoHelper.ADBHelper.Tap(deviceID, p.X, p.Y);
-                }
+            //// tap in arrow icon 
+            //try
+            //{
+            //    Bitmap screen = KAutoHelper.ADBHelper.ScreenShoot(deviceID);
+            //    Point p = (Point)ToolHeper.FindOutPoint(screen, /*arrow*/_checked, 0.9);
+            //    if (p != null)
+            //    {
+            //        KAutoHelper.ADBHelper.Tap(deviceID, p.X, p.Y);
+            //    }
 
-            }
-            catch (Exception ex)
+            //}
+            //catch (Exception ex)
+            //{
+            //    Console.WriteLine(ex.Message);
+            //}
+
+            // get list username
+            List<string> listUsername = GetListUsernam("data//usernames.txt");
+            if(listUsername != null)
             {
-                Console.WriteLine(ex.Message);
+                foreach(String username in listUsername)
+                {
+                    Console.WriteLine(username);
+                }
             }
         }
 
