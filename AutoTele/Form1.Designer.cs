@@ -33,8 +33,6 @@
             this.rtxt_console = new System.Windows.Forms.RichTextBox();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
-            this.btn_getList = new System.Windows.Forms.Button();
-            this.btn_getLDName = new System.Windows.Forms.Button();
             this.dtgv_device_account = new System.Windows.Forms.DataGridView();
             this.btn_end = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
@@ -100,26 +98,6 @@
             this.label1.TabIndex = 5;
             this.label1.Text = "Number of thread";
             // 
-            // btn_getList
-            // 
-            this.btn_getList.Location = new System.Drawing.Point(30, 108);
-            this.btn_getList.Name = "btn_getList";
-            this.btn_getList.Size = new System.Drawing.Size(82, 23);
-            this.btn_getList.TabIndex = 6;
-            this.btn_getList.Text = "get list";
-            this.btn_getList.UseVisualStyleBackColor = true;
-            this.btn_getList.Click += new System.EventHandler(this.btn_getList_Click);
-            // 
-            // btn_getLDName
-            // 
-            this.btn_getLDName.Location = new System.Drawing.Point(136, 108);
-            this.btn_getLDName.Name = "btn_getLDName";
-            this.btn_getLDName.Size = new System.Drawing.Size(75, 23);
-            this.btn_getLDName.TabIndex = 7;
-            this.btn_getLDName.Text = "get ld name";
-            this.btn_getLDName.UseVisualStyleBackColor = true;
-            this.btn_getLDName.Click += new System.EventHandler(this.btn_getLDName_Click);
-            // 
             // dtgv_device_account
             // 
             this.dtgv_device_account.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
@@ -133,11 +111,11 @@
             // 
             // btn_end
             // 
-            this.btn_end.Location = new System.Drawing.Point(266, 22);
+            this.btn_end.Location = new System.Drawing.Point(231, 22);
             this.btn_end.Name = "btn_end";
             this.btn_end.Size = new System.Drawing.Size(75, 23);
             this.btn_end.TabIndex = 9;
-            this.btn_end.Text = "button1";
+            this.btn_end.Text = "stop";
             this.btn_end.UseVisualStyleBackColor = true;
             this.btn_end.Click += new System.EventHandler(this.btn_end_Click);
             // 
@@ -148,8 +126,6 @@
             this.ClientSize = new System.Drawing.Size(1098, 593);
             this.Controls.Add(this.btn_end);
             this.Controls.Add(this.dtgv_device_account);
-            this.Controls.Add(this.btn_getLDName);
-            this.Controls.Add(this.btn_getList);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.numericUpDown1);
             this.Controls.Add(this.rtxt_console);
@@ -173,8 +149,6 @@
         private System.Windows.Forms.RichTextBox rtxt_console;
         private System.Windows.Forms.NumericUpDown numericUpDown1;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button btn_getList;
-        private System.Windows.Forms.Button btn_getLDName;
         private System.Windows.Forms.DataGridView dtgv_device_account;
         private System.Windows.Forms.Button btn_end;
     }

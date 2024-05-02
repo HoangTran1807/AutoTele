@@ -25,6 +25,8 @@ namespace AutoTele
         List<String> ListUsername = new List<string>();
         private static readonly ThreadLocal<Random> threadLocalRandom = new ThreadLocal<Random>(() => new Random(Guid.NewGuid().GetHashCode()));
         static bool isRunning = false;
+        Bitmap gr_chat = (Bitmap)Image.FromFile("data//gr_chat.png");
+        Bitmap disablesend = (Bitmap)Image.FromFile("data//disablesend.png");
 
 
 
@@ -53,11 +55,11 @@ namespace AutoTele
             {
                 case 1:
                     // do something
-                    KAutoHelper.ADBHelper.Swipe(deviceId, 500, 500, 500, 1000);
+                    AutoJoinGr_Chat(deviceId,0);
                     break;
                 case 2:
                     // do something
-                    KAutoHelper.ADBHelper.Swipe(deviceId, 500, 1000, 500, 500);
+                    AutoJoinGr_Chat(deviceId,0);
                     break;
                 default:
                     break;
@@ -121,69 +123,41 @@ namespace AutoTele
         private async void btn_createNew_Click(object sender, EventArgs e)
         {
 
-            int states_thead = LDInstanceNames.Count / ThreadPerRound;
-
-            for (int i = 0; i < states_thead; i++)
-            {
-                List<String> devices = KAutoHelper.ADBHelper.GetDevices();
-                List<Task> tasks = new List<Task>();
-
-                foreach (String device in devices)
-                {
-                    tasks.Add(Task.Run(() =>
-                    {
-                        this.Invoke((MethodInvoker)delegate
-                        {
-                            rtxt_console.AppendText(device + " is running...\n");
-                        });
-                        // Run dosomething on a different thread
-                        var result = dosomething(device);
-                        this.Invoke((MethodInvoker)delegate
-                        {
-                            rtxt_console.AppendText(device + " do " + result + "\n");
-                        });
-
-
-                        this.Invoke((MethodInvoker)delegate
-                        {
-                            rtxt_console.AppendText(device + " is done...\n");
-                        });
-                    }));
-                }
-
-                await Task.WhenAll(tasks);
-                rtxt_console.AppendText("Round " + i + " is done...\n");
-            }
-            startMultiThread();
+            Task.Run(() => startMultiThread());
         }
 
         private async void startMultiThread()
         {
-            
-        }
-
-        private async void btn_getList_Click(object sender, EventArgs e)
-        {
-
-            int numberOfRound = 3;/*(int)LDInstanceNames.Count / ThreadPerRound;*/
+            int numberOfRound = 2;/*(int)LDInstanceNames.Count / ThreadPerRound;*/
             isRunning = true;
+
             for (int i = 0; i < numberOfRound; i++)
             {
-                if(!isRunning)
+                if (!isRunning)
                 {
                     break;
                 }
                 int startIndex = i * ThreadPerRound;
                 int endIndex = (i + 1) * ThreadPerRound;
+                closeAll();
                 for (int j = startIndex; j < endIndex; j++)
                 {
                     OpenLDPlayer(LDInstanceNames[j]);
+                    this.Invoke((MethodInvoker)delegate
+                    {
+                        rtxt_console.AppendText(LDInstanceNames[j] + " is opened...\n");
+                    });
+                    Thread.Sleep(6000);
                 }
-                Thread.Sleep(30000);
+                Thread.Sleep(120000);
                 List<String> devices = KAutoHelper.ADBHelper.GetDevices();
                 List<Task> tasks = new List<Task>();
                 foreach (String device in devices)
                 {
+                    if (String.IsNullOrEmpty(device))
+                    {
+                        break;
+                    }
                     tasks.Add(Task.Run(() =>
                     {
                         this.Invoke((MethodInvoker)delegate
@@ -205,12 +179,18 @@ namespace AutoTele
                     }));
                 }
                 await Task.WhenAll(tasks);
-                rtxt_console.AppendText("Round " + i + " is done...\n");
-                closeAll();
-
-
+                this.Invoke((MethodInvoker)delegate
+                {
+                    rtxt_console.AppendText("Round " + i + " is done...\n");
+                });
             }
+
+            this.Invoke((MethodInvoker)delegate
+            {
+                rtxt_console.AppendText("All done...\n");
+            });
         }
+
 
         private void OpenLDPlayer(String device)
         {
@@ -300,10 +280,6 @@ namespace AutoTele
             }
         }
 
-        private void btn_getLDName_Click(object sender, EventArgs e)
-        {
-            getListNameLDPlayer();
-        }
 
         private void LoadData()
         {
@@ -339,6 +315,59 @@ namespace AutoTele
         private void btn_end_Click(object sender, EventArgs e)
         {
             isRunning = false;
+        }
+
+        public async void AutoJoinGr_Chat(String deviceID,int i)
+        {
+            if (i == 4)
+            {
+                return;
+            }
+            KAutoHelper.ADBHelper.Tap(deviceID, 998, 145);
+            //string[] gr = { "cryto gr", "freefire", "riot", "alumine", "golden star", "doremon" };
+            string[] gr = { "cryto gr", "freefire", "riot", "alumine" };
+            string[] chat = { "hi", "how are u", "lol", "haha", "555", "tui la con cho ngu" };
+            // Tạo một đối tượng Random
+            Random rand = new Random();
+
+            // Chọn một chỉ mục ngẫu nhiên trong mảng
+            int indexgr = rand.Next(0, gr.Length);
+            int indexchat = rand.Next(0, chat.Length);
+
+            // Lấy phần tử tại chỉ mục đã chọn
+            string choosegr = gr[indexgr];
+            string choosechat = chat[indexchat];
+            KAutoHelper.ADBHelper.InputText(deviceID, choosegr);
+            KAutoHelper.ADBHelper.Delay(2000);
+            proc task1 = new proc();
+            // click on the gr_chat icon
+            if (task1.clickChildImage(gr_chat, deviceID))
+            {
+                Console.WriteLine("Click on the gr_chat icon");
+                KAutoHelper.ADBHelper.Delay(2000);
+                KAutoHelper.ADBHelper.Tap(deviceID, 530, 1852);
+                KAutoHelper.ADBHelper.Delay(5000);
+                Bitmap screen = KAutoHelper.ADBHelper.ScreenShoot(deviceID);
+                screen.Save("aa.png");
+                Point? checkdisable = task1.FindOutPoint(screen, disablesend);
+                if (checkdisable == null)
+                {
+                    KAutoHelper.ADBHelper.Tap(deviceID, 276, 1855);
+                    KAutoHelper.ADBHelper.InputText(deviceID, choosechat);
+                    KAutoHelper.ADBHelper.Tap(deviceID, 1004, 1842);
+                }
+                else
+                {
+                    KAutoHelper.ADBHelper.Tap(deviceID, 71, 155);
+                    AutoJoinGr_Chat(deviceID,i+1);
+                }
+
+            }
+            else
+            {
+                Console.WriteLine("Cannot click on the gr_chat icon");
+                AutoJoinGr_Chat(deviceID,i+1);
+            }
         }
     }
 }
