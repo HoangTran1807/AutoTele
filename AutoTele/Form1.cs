@@ -14,14 +14,17 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
 
 namespace AutoTele
 {
     public partial class Form1 : Form
     {
         int ThreadPerRound = 3;
-        int TotalThread = 10;
-
+        List<String> LDInstanceNames = new List<string>();
+        List<String> ListUsername = new List<string>();
+        private static readonly ThreadLocal<Random> threadLocalRandom = new ThreadLocal<Random>(() => new Random(Guid.NewGuid().GetHashCode()));
+        static bool isRunning = false;
 
 
 
@@ -33,11 +36,9 @@ namespace AutoTele
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            
+            getListNameLDPlayer();
+            LoadData();
         }
-
-
-        private static readonly ThreadLocal<Random> threadLocalRandom = new ThreadLocal<Random>(() => new Random(Guid.NewGuid().GetHashCode()));
 
         public static int GetRandomNumber(int min, int max)
         {
@@ -119,7 +120,8 @@ namespace AutoTele
 
         private async void btn_createNew_Click(object sender, EventArgs e)
         {
-            int states_thead = TotalThread / ThreadPerRound;
+
+            int states_thead = LDInstanceNames.Count / ThreadPerRound;
 
             for (int i = 0; i < states_thead; i++)
             {
@@ -152,6 +154,191 @@ namespace AutoTele
                 await Task.WhenAll(tasks);
                 rtxt_console.AppendText("Round " + i + " is done...\n");
             }
+            startMultiThread();
+        }
+
+        private async void startMultiThread()
+        {
+            
+        }
+
+        private async void btn_getList_Click(object sender, EventArgs e)
+        {
+
+            int numberOfRound = 3;/*(int)LDInstanceNames.Count / ThreadPerRound;*/
+            isRunning = true;
+            for (int i = 0; i < numberOfRound; i++)
+            {
+                if(!isRunning)
+                {
+                    break;
+                }
+                int startIndex = i * ThreadPerRound;
+                int endIndex = (i + 1) * ThreadPerRound;
+                for (int j = startIndex; j < endIndex; j++)
+                {
+                    OpenLDPlayer(LDInstanceNames[j]);
+                }
+                Thread.Sleep(30000);
+                List<String> devices = KAutoHelper.ADBHelper.GetDevices();
+                List<Task> tasks = new List<Task>();
+                foreach (String device in devices)
+                {
+                    tasks.Add(Task.Run(() =>
+                    {
+                        this.Invoke((MethodInvoker)delegate
+                        {
+                            rtxt_console.AppendText(device + " is running...\n");
+                        });
+                        // Run dosomething on a different thread
+                        var result = dosomething(device);
+                        this.Invoke((MethodInvoker)delegate
+                        {
+                            rtxt_console.AppendText(device + " do " + result + "\n");
+                        });
+
+
+                        this.Invoke((MethodInvoker)delegate
+                        {
+                            rtxt_console.AppendText(device + " is done...\n");
+                        });
+                    }));
+                }
+                await Task.WhenAll(tasks);
+                rtxt_console.AppendText("Round " + i + " is done...\n");
+                closeAll();
+
+
+            }
+        }
+
+        private void OpenLDPlayer(String device)
+        {
+            string targetDir = @"C:\LDPlayer\LDPlayer9"; // Replace with your target directory path
+            string command = "launchex --name "+device+" --packagename org.telegram.messenger.web"; // Replace with your actual command
+
+            Process process = new Process();
+            process.StartInfo.FileName = targetDir + @"\ldconsole.exe";
+            process.StartInfo.Arguments = command;
+            process.StartInfo.WorkingDirectory = null; // Use current directory
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.UseShellExecute = false;
+
+            process.Start();
+
+            StreamReader reader = process.StandardOutput;
+            string outputLine;
+            while ((outputLine = reader.ReadLine()) != null)
+            {
+                Console.WriteLine(outputLine);
+            }
+
+            process.WaitForExit();
+
+            if (process.ExitCode != 0)
+            {
+                Console.WriteLine("Error: Process exited with code " + process.ExitCode);
+            }
+        }
+
+        private void getListNameLDPlayer()
+        {
+            
+            string targetDir = @"C:\LDPlayer\LDPlayer9"; // Replace with your target directory path
+            string command = "list"; // Replace with your actual command
+
+            Process process = new Process();
+            process.StartInfo.FileName = targetDir + @"\ldconsole.exe";
+            process.StartInfo.Arguments = command;
+            process.StartInfo.WorkingDirectory = null; // Use current directory
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.UseShellExecute = false;
+
+            process.Start();
+
+            StreamReader reader = process.StandardOutput;
+            string outputLine;
+            while ((outputLine = reader.ReadLine()) != null)
+            {
+                LDInstanceNames.Add(outputLine);
+            }
+
+            process.WaitForExit();
+
+            if (process.ExitCode != 0)
+            {
+                Console.WriteLine("Error: Process exited with code " + process.ExitCode);
+            }
+        }
+
+        private void closeAll()
+        {
+            string targetDir = @"C:\LDPlayer\LDPlayer9"; // Replace with your target directory path
+            string command = "quitall"; // Replace with your actual command
+
+            Process process = new Process();
+            process.StartInfo.FileName = targetDir + @"\ldconsole.exe";
+            process.StartInfo.Arguments = command;
+            process.StartInfo.WorkingDirectory = null; // Use current directory
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.UseShellExecute = false;
+
+            process.Start();
+
+            StreamReader reader = process.StandardOutput;
+            string outputLine;
+            while ((outputLine = reader.ReadLine()) != null)
+            {
+                LDInstanceNames.Add(outputLine);
+            }
+
+            process.WaitForExit();
+
+            if (process.ExitCode != 0)
+            {
+                Console.WriteLine("Error: Process exited with code " + process.ExitCode);
+            }
+        }
+
+        private void btn_getLDName_Click(object sender, EventArgs e)
+        {
+            getListNameLDPlayer();
+        }
+
+        private void LoadData()
+        {
+            DataTable dt = new DataTable();
+            dt.Columns.Add("DeviceName");
+            dt.Columns.Add("UserName");
+
+            foreach (String device in LDInstanceNames)
+            {
+                DataRow row = dt.NewRow();
+                row["DeviceName"] = device;
+                row["UserName"] = "Hoang";
+                dt.Rows.Add(row);
+            }
+
+            dtgv_device_account.DataSource = dt;
+        }
+
+        private void dtgv_device_account_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            
+        }
+
+        private void dtgv_device_account_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            isRunning = false;
+        }
+
+        private void btn_end_Click(object sender, EventArgs e)
+        {
+            isRunning = false;
         }
     }
 }
