@@ -52,6 +52,8 @@
             this.installTeleForAllDeviceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.btn_selectedLD = new System.Windows.Forms.Button();
+            this.configForAllDeviceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.btn_selectedAll = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
@@ -62,6 +64,7 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.btn_selectedAll);
             this.panel1.Controls.Add(this.btn_selectedLD);
             this.panel1.Controls.Add(this.dataGridView1);
             this.panel1.Controls.Add(this.panel2);
@@ -278,7 +281,8 @@
             // toolToolStripMenuItem
             // 
             this.toolToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.installTeleForAllDeviceToolStripMenuItem});
+            this.installTeleForAllDeviceToolStripMenuItem,
+            this.configForAllDeviceToolStripMenuItem});
             this.toolToolStripMenuItem.Name = "toolToolStripMenuItem";
             this.toolToolStripMenuItem.Size = new System.Drawing.Size(50, 20);
             this.toolToolStripMenuItem.Text = "Menu";
@@ -301,13 +305,30 @@
             // 
             // btn_selectedLD
             // 
-            this.btn_selectedLD.Location = new System.Drawing.Point(910, 299);
+            this.btn_selectedLD.Location = new System.Drawing.Point(849, 297);
             this.btn_selectedLD.Name = "btn_selectedLD";
             this.btn_selectedLD.Size = new System.Drawing.Size(102, 23);
             this.btn_selectedLD.TabIndex = 26;
             this.btn_selectedLD.Text = "selected";
             this.btn_selectedLD.UseVisualStyleBackColor = true;
             this.btn_selectedLD.Click += new System.EventHandler(this.btn_selectedLD_Click);
+            // 
+            // configForAllDeviceToolStripMenuItem
+            // 
+            this.configForAllDeviceToolStripMenuItem.Name = "configForAllDeviceToolStripMenuItem";
+            this.configForAllDeviceToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
+            this.configForAllDeviceToolStripMenuItem.Text = "config for all device";
+            this.configForAllDeviceToolStripMenuItem.Click += new System.EventHandler(this.configForAllDeviceToolStripMenuItem_Click);
+            // 
+            // btn_selectedAll
+            // 
+            this.btn_selectedAll.Location = new System.Drawing.Point(966, 297);
+            this.btn_selectedAll.Name = "btn_selectedAll";
+            this.btn_selectedAll.Size = new System.Drawing.Size(102, 23);
+            this.btn_selectedAll.TabIndex = 27;
+            this.btn_selectedAll.Text = "selected all";
+            this.btn_selectedAll.UseVisualStyleBackColor = true;
+            this.btn_selectedAll.Click += new System.EventHandler(this.btn_selectedAll_Click);
             // 
             // Form1
             // 
@@ -360,6 +381,8 @@
         private System.Windows.Forms.ToolStripMenuItem installTeleForAllDeviceToolStripMenuItem;
         private System.Windows.Forms.Button btn_selectedLD;
         private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.ToolStripMenuItem configForAllDeviceToolStripMenuItem;
+        private System.Windows.Forms.Button btn_selectedAll;
     }
 }
 

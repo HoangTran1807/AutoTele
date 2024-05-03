@@ -23,14 +23,14 @@ namespace AutoTele
     {
         // ========================================== VARIABLE ==========================================
         #region variable
-        int ThreadPerRound = 0;
+        int ThreadPerRound = 2;
 
         private static readonly ThreadLocal<Random> threadLocalRandom = new ThreadLocal<Random>(() => new Random(Guid.NewGuid().GetHashCode()));
         static bool isRunning = false;
 
         private static readonly Random random = new Random();
 
-       Bitmap gr_chat = (Bitmap)Image.FromFile("data//gr_chat.png");
+        Bitmap gr_chat = (Bitmap)Image.FromFile("data//gr_chat.png");
         Bitmap disablesend = (Bitmap)Image.FromFile("data//disablesend.png");
         Bitmap dropdown = (Bitmap)Image.FromFile("data//dropdown.png");
         Bitmap login = (Bitmap)Image.FromFile("data//login.png");
@@ -38,14 +38,16 @@ namespace AutoTele
         List<String> LDInstanceNames = new List<string>();
         List<String> SelectedLD = new List<string>();
         List<String> ListUsername = new List<string>();
+
         List<String> listChat = new List<string>();
         List<String> listGr = new List<string>();
         #endregion
 
         // ========================================== PATH ==========================================
         #region "Path"
+        String START_UP = "data//startUp.txt";
         String ADB_FOLDER_PATH = "";
-        String LDPLAYER_FOLDER_PATH = @"C:\LDPlayer\LDPlayer9";
+        String LDPLAYER_FOLDER_PATH = "";
         String CHAT_PATH = "";
         String GROUP_PATH = "";
         #endregion
@@ -60,18 +62,76 @@ namespace AutoTele
         public Form1()
         {
             InitializeComponent();
+            
         }
 
+        public void startUp()
+        {
+           
+            try
+            {
+                string[] lines = File.ReadAllLines(START_UP);
+                foreach (String line in File.ReadAllLines(START_UP))
+                {
+                    if (line.Contains("ADB_FOLDER_PATH"))
+                    {
+                        ADB_FOLDER_PATH = line.Split('=')[1];
+
+                    }
+                    if (line.Contains("LDPLAYER_FOLDER_PATH"))
+                    {
+                        LDPLAYER_FOLDER_PATH = line.Split('=')[1];
+                        getListNameLDPlayer();
+                    }
+                    if (line.Contains("CHAT_PATH"))
+                    {
+                        CHAT_PATH = line.Split('=')[1];
+                        LoadListChat();
+                    }
+                    if (line.Contains("GROUP_PATH"))
+                    {
+                        GROUP_PATH = line.Split('=')[1];
+                        LoadListGroup();
+                    }
+                    if (line.Contains("THREAD_PER_ROUND"))
+                    {
+                        ThreadPerRound = Int32.Parse(line.Split('=')[1]);
+                        ThreadPerRound = ThreadPerRound == 0 ? 2 : ThreadPerRound;
+                    }
+                }
+            }
+            catch (FileNotFoundException e)
+            {
+                Console.WriteLine("Error: File not found - " + START_UP);
+            }
+
+            
+            
+
+        }
+
+        public void saveStartUp()
+        {
+            List<String> lines = new List<string>();
+            lines.Add("ADB_FOLDER_PATH=" + ADB_FOLDER_PATH);
+            lines.Add("LDPLAYER_FOLDER_PATH=" + LDPLAYER_FOLDER_PATH);
+            lines.Add("CHAT_PATH=" + CHAT_PATH);
+            lines.Add("GROUP_PATH=" + GROUP_PATH);
+            lines.Add("THREAD_PER_ROUND=" + ThreadPerRound);
+            File.WriteAllLines(START_UP, lines);
+        }
 
         // ========================================== EVENT ==========================================
         #region event
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            startUp();
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
+            saveStartUp();
             isRunning = false;
         }
 
@@ -117,7 +177,7 @@ namespace AutoTele
                 CHAT_PATH = txt_chatpath.Text;
                 rtxt_chats.Clear();
                 LoadListChat();
-                RenderChat();
+               
             }
         }
 
@@ -135,7 +195,6 @@ namespace AutoTele
                 GROUP_PATH = txt_grouppath.Text;
                 rtxt_groups.Clear();
                 LoadListGroup();
-                RenderGroup();
             }
 
         }
@@ -251,7 +310,7 @@ namespace AutoTele
                 return;
             }
 
-            int numberOfRound = deviceCount / ThreadPerRound;
+            int numberOfRound = (int) Math.Ceiling((double)deviceCount / ThreadPerRound);
             isRunning = true;
 
             for (int i = 0; i < numberOfRound; i++)
@@ -263,6 +322,10 @@ namespace AutoTele
                 }
                 int startIndex = i * ThreadPerRound;
                 int endIndex = (i + 1) * ThreadPerRound;
+                if(endIndex > deviceCount)
+                {
+                    endIndex = deviceCount;
+                }
                 closeAll();
                 for (int j = startIndex; j < endIndex; j++)
                 {
@@ -273,7 +336,7 @@ namespace AutoTele
                     });
                 }
 
-                int numberOfDevice = ((endIndex > deviceCount) ? deviceCount : endIndex) - startIndex;
+                int numberOfDevice = endIndex - startIndex;
                 List<String> devices = new List<String>();
                 int count = 0;
                 while (devices.Count < numberOfDevice)
@@ -341,7 +404,7 @@ namespace AutoTele
                 return;
             }
 
-            int numberOfRound = deviceCount / ThreadPerRound;
+            int numberOfRound = (int)Math.Ceiling((double)deviceCount / ThreadPerRound);
             isRunning = true;
 
             for (int i = 0; i < numberOfRound; i++)
@@ -353,6 +416,10 @@ namespace AutoTele
                 }
                 int startIndex = i * ThreadPerRound;
                 int endIndex = (i + 1) * ThreadPerRound;
+                if(endIndex > deviceCount)
+                {
+                    endIndex = deviceCount;
+                }
                 closeAll();
                 for (int j = startIndex; j < endIndex; j++)
                 {
@@ -363,7 +430,7 @@ namespace AutoTele
                     });
                 }
 
-                int numberOfDevice = ((endIndex > deviceCount) ? deviceCount : endIndex) - startIndex;
+                int numberOfDevice = endIndex - startIndex;
                 List<String> devices = new List<String>();
                 int count = 0;
                 while (devices.Count < numberOfDevice)
@@ -595,26 +662,29 @@ namespace AutoTele
             }
             KAutoHelper.ADBHelper.Tap(deviceID, 998, 145);
 
-            string[] gr = { "cryto gr", "freefire", "riot", "alumine", "golden star", "doremon" };
-            string[] chat = { "kkkk", "Hello", "hi", "how are u", "lol", "haha", "555", "tui la con cho ngu" };
-
             // Tạo một đối tượng Random
             Random rand = new Random();
 
             // Chọn một chỉ mục ngẫu nhiên trong mảng
-            int indexgr = rand.Next(0, gr.Length);
-            int indexchat = rand.Next(0, chat.Length);
+            int indexgr = rand.Next(0, listGr.Count);
+            int indexchat = rand.Next(0, listChat.Count);
 
             // Lấy phần tử tại chỉ mục đã chọn
-            string choosegr = gr[indexgr];
-            string choosechat = chat[indexchat];
+            string choosegr = listChat[indexgr];
+            string choosechat = listGr[indexchat];
 
 
             KAutoHelper.ADBHelper.InputText(deviceID, choosegr);
-            KAutoHelper.ADBHelper.Delay(7000);
+            KAutoHelper.ADBHelper.Delay(10000);
             // tìm gr chat 
-            if (task1.clickChildImage(gr_chat, deviceID))
+
+            Bitmap screen4 = KAutoHelper.ADBHelper.ScreenShoot(deviceID);
+            Point? checkgr_chat = task1.FindOutPoint(screen4, gr_chat);
+
+
+            if (checkgr_chat != null )
             {
+                task1.clickChildImage(gr_chat, deviceID);
                 KAutoHelper.ADBHelper.Delay(7000);
                 Bitmap screen1 = KAutoHelper.ADBHelper.ScreenShoot(deviceID);
                 Point? checklogin = task1.FindOutPoint(screen1, login);
@@ -632,16 +702,20 @@ namespace AutoTele
                 {
                     KAutoHelper.ADBHelper.Delay(random.Next(10000, 30001));
                     KAutoHelper.ADBHelper.Tap(deviceID, 276, 1855);
+                    KAutoHelper.ADBHelper.Delay(random.Next(1000, 2000));
                     KAutoHelper.ADBHelper.InputText(deviceID, choosechat);
+                    KAutoHelper.ADBHelper.Delay(random.Next(1000, 2000));
                     KAutoHelper.ADBHelper.Tap(deviceID, 1004, 1842);
-                    KAutoHelper.ADBHelper.Delay(2000);
+                    KAutoHelper.ADBHelper.Delay(random.Next(1000, 2000));
                     KAutoHelper.ADBHelper.Tap(deviceID, 71, 155);
                     KAutoHelper.ADBHelper.Delay(random.Next(120000, 300000));
                     AutoJoinGr_Chat(deviceID, i + 1, numberAcc, false);
                 }
                 else
                 {
+                    KAutoHelper.ADBHelper.Delay(random.Next(1000, 2000));
                     KAutoHelper.ADBHelper.Tap(deviceID, 71, 155);
+                    KAutoHelper.ADBHelper.Delay(random.Next(1000, 2000));
                     AutoJoinGr_Chat(deviceID, i + 1, numberAcc, false);
                 }
 
@@ -657,12 +731,13 @@ namespace AutoTele
         private void LoadListChat()
         {
             listChat = TXTReader(CHAT_PATH);
-
+            RenderChat();
         }
 
         private void LoadListGroup()
         {
             listGr = TXTReader(GROUP_PATH);
+            RenderGroup();
         }
 
         public bool autoInstallTelegram(String deviceID)
@@ -792,6 +867,60 @@ namespace AutoTele
                 }
             }
             dataGridView1.DataSource = dt;
+        }
+
+        private void configForAllDeviceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            
+            foreach (String device in SelectedLD)
+            {
+                configForDriver(device);
+            }
+        }
+
+        private void configForDriver(String deviceID)
+        {
+
+            string targetDir = LDPLAYER_FOLDER_PATH;
+            string command = "modify --name " + deviceID + @" --resolution ""1080,1920,480"" --cpu 4 --memory 2048 --manufacturer samsung --model SM-G973N"; ;
+
+            Process process = new Process();
+            process.StartInfo.FileName = targetDir + @"\ldconsole.exe";
+            process.StartInfo.Arguments = command;
+            process.StartInfo.WorkingDirectory = null;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.UseShellExecute = false;
+
+            process.Start();
+
+            StreamReader reader = process.StandardOutput;
+            string outputLine;
+            while ((outputLine = reader.ReadLine()) != null)
+            {
+            }
+
+            process.WaitForExit();
+
+            if (process.ExitCode != 0)
+            {
+                Console.WriteLine("Error: Process exited with code " + process.ExitCode);
+            }
+        }
+
+        private void btn_selectedAll_Click(object sender, EventArgs e)
+        {
+            DataTable dt = (DataTable) dtgv_device_account.DataSource;
+            if (dt != null)
+            {
+                foreach (DataRow row in dt.Rows)
+                {
+                    row["Select"] = true;
+                }
+            }
+            
+            dataGridView1.DataSource = dt;
+            btn_selectedLD_Click(sender, e);
         }
     }
 }

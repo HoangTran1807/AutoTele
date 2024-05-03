@@ -3,20 +3,20 @@
   "WorkspaceRootPath": "C:\\Hoang\\DotNet\\AutoTele2\\AutoTele\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{1B8B6216-3E57-4FF6-A4CE-84895E109E81}|AutoTele\\AutoTele.csproj|C:\\Hoang\\DotNet\\AutoTele2\\AutoTele\\autotele\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{1B8B6216-3E57-4FF6-A4CE-84895E109E81}|AutoTele\\AutoTele.csproj|solutionrelative:autotele\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{1B8B6216-3E57-4FF6-A4CE-84895E109E81}|AutoTele\\AutoTele.csproj|C:\\Hoang\\DotNet\\AutoTele2\\AutoTele\\autotele\\form1.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1B8B6216-3E57-4FF6-A4CE-84895E109E81}|AutoTele\\AutoTele.csproj|solutionrelative:autotele\\form1.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{1B8B6216-3E57-4FF6-A4CE-84895E109E81}|AutoTele\\AutoTele.csproj|C:\\Hoang\\DotNet\\AutoTele2\\AutoTele\\autotele\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{1B8B6216-3E57-4FF6-A4CE-84895E109E81}|AutoTele\\AutoTele.csproj|solutionrelative:autotele\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{1B8B6216-3E57-4FF6-A4CE-84895E109E81}|AutoTele\\AutoTele.csproj|C:\\Hoang\\DotNet\\AutoTele2\\AutoTele\\autotele\\form1.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{1B8B6216-3E57-4FF6-A4CE-84895E109E81}|AutoTele\\AutoTele.csproj|solutionrelative:autotele\\form1.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{1B8B6216-3E57-4FF6-A4CE-84895E109E81}|AutoTele\\AutoTele.csproj|c:\\hoang\\dotnet\\autotele2\\autotele\\autotele\\toolheper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{1B8B6216-3E57-4FF6-A4CE-84895E109E81}|AutoTele\\AutoTele.csproj|solutionrelative:autotele\\toolheper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1B8B6216-3E57-4FF6-A4CE-84895E109E81}|AutoTele\\AutoTele.csproj|C:\\Hoang\\DotNet\\AutoTele2\\AutoTele\\autotele\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1B8B6216-3E57-4FF6-A4CE-84895E109E81}|AutoTele\\AutoTele.csproj|solutionrelative:autotele\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{1B8B6216-3E57-4FF6-A4CE-84895E109E81}|AutoTele\\AutoTele.csproj|C:\\Hoang\\DotNet\\AutoTele2\\AutoTele\\autotele\\proc.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -30,17 +30,17 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 0,
               "Title": "Form1.Designer.cs",
               "DocumentMoniker": "C:\\Hoang\\DotNet\\AutoTele2\\AutoTele\\AutoTele\\Form1.Designer.cs",
               "RelativeDocumentMoniker": "AutoTele\\Form1.Designer.cs",
               "ToolTip": "C:\\Hoang\\DotNet\\AutoTele2\\AutoTele\\AutoTele\\Form1.Designer.cs",
               "RelativeToolTip": "AutoTele\\Form1.Designer.cs",
-              "ViewState": "AQIAAP8AAAAAAAAAAAAnwDcBAAAAAAAA",
+              "ViewState": "AQIAADcBAAAAAAAAAAAAAEwBAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-04-29T09:02:35.864Z",
               "EditorCaption": ""
@@ -60,7 +60,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 2,
               "Title": "ToolHeper.cs",
               "DocumentMoniker": "C:\\Hoang\\DotNet\\AutoTele2\\AutoTele\\AutoTele\\ToolHeper.cs",
               "RelativeDocumentMoniker": "AutoTele\\ToolHeper.cs",
@@ -73,13 +73,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 3,
               "Title": "Form1.cs",
               "DocumentMoniker": "C:\\Hoang\\DotNet\\AutoTele2\\AutoTele\\AutoTele\\Form1.cs",
               "RelativeDocumentMoniker": "AutoTele\\Form1.cs",
-              "ToolTip": "C:\\Hoang\\DotNet\\AutoTele2\\AutoTele\\AutoTele\\Form1.cs*",
-              "RelativeToolTip": "AutoTele\\Form1.cs*",
-              "ViewState": "AQIAAE0BAAAAAAAAAAAAADABAAAYAAAA",
+              "ToolTip": "C:\\Hoang\\DotNet\\AutoTele2\\AutoTele\\AutoTele\\Form1.cs",
+              "RelativeToolTip": "AutoTele\\Form1.cs",
+              "ViewState": "AQIAAIYAAAAAAAAAAAAjwJQAAAAMAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-04-26T13:41:31.307Z",
               "EditorCaption": ""
@@ -90,8 +90,8 @@
               "Title": "Form1.cs [Design]",
               "DocumentMoniker": "C:\\Hoang\\DotNet\\AutoTele2\\AutoTele\\AutoTele\\Form1.cs",
               "RelativeDocumentMoniker": "AutoTele\\Form1.cs",
-              "ToolTip": "C:\\Hoang\\DotNet\\AutoTele2\\AutoTele\\AutoTele\\Form1.cs [Design]*",
-              "RelativeToolTip": "AutoTele\\Form1.cs [Design]*",
+              "ToolTip": "C:\\Hoang\\DotNet\\AutoTele2\\AutoTele\\AutoTele\\Form1.cs [Design]",
+              "RelativeToolTip": "AutoTele\\Form1.cs [Design]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-04-26T13:38:18.297Z",
               "EditorCaption": " [Design]"
