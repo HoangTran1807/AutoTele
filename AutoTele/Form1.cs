@@ -20,14 +20,28 @@ namespace AutoTele
 {
     public partial class Form1 : Form
     {
+        // ========================================== VARIABLE ==========================================
+        #region variable
         int ThreadPerRound = 3;
         List<String> LDInstanceNames = new List<string>();
         List<String> ListUsername = new List<string>();
         private static readonly ThreadLocal<Random> threadLocalRandom = new ThreadLocal<Random>(() => new Random(Guid.NewGuid().GetHashCode()));
         static bool isRunning = false;
+
         Bitmap gr_chat = (Bitmap)Image.FromFile("data//gr_chat.png");
         Bitmap disablesend = (Bitmap)Image.FromFile("data//disablesend.png");
 
+        List<String> listChat = new List<string>();
+        List<String> listGr = new List<string>();
+        #endregion
+
+        // ========================================== PATH ==========================================
+        #region "Path"
+        String ADB_FOLDER_PATH = "";
+        String LDPLAYER_FOLDER_PATH = @"C:\LDPlayer\LDPlayer9";
+        String CHAT_PATH = "";
+        String GROUP_PATH = "";
+        #endregion
 
 
 
@@ -36,11 +50,104 @@ namespace AutoTele
             InitializeComponent();
         }
 
+
+        // ========================================== EVENT ==========================================
+        #region event
+
         private void Form1_Load(object sender, EventArgs e)
         {
             getListNameLDPlayer();
             LoadData();
         }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            isRunning = false;
+        }
+
+        private void btn_Start_Click(object sender, EventArgs e)
+        {
+            Task.Run(() => startMultiThread());
+        }
+        private void btn_end_Click(object sender, EventArgs e)
+        {
+            isRunning = false;
+        }
+
+        public void btn_checkTele_Click(object sender, EventArgs e)
+        {
+            List<String> devices = KAutoHelper.ADBHelper.GetDevices();
+            foreach (String device in devices)
+            {
+                if (IsInstalledTelegram(device))
+                {
+                    MessageBox.Show(device + " is installed");
+                }
+                else
+                {
+                    MessageBox.Show(device + " is not installed");
+                }
+            }
+        }
+
+        private void btn_selectChatPath_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+            openFileDialog1.Filter = "All files (*.txt*)|*.txt*";
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+                txt_chatpath.Text = openFileDialog1.FileName;
+            if (!String.IsNullOrEmpty(txt_chatpath.Text.Trim()))
+            {
+                CHAT_PATH = txt_chatpath.Text;
+                rtxt_chats.Clear();
+                LoadListChat();
+                RenderChat();
+            }
+        }
+
+
+
+
+        private void btn_selectGroupPath_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+            openFileDialog1.Filter = "All files (*.txt*)|*.txt*";
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+                txt_grouppath.Text = openFileDialog1.FileName;
+            if(!String.IsNullOrEmpty(txt_grouppath.Text.Trim()))
+            {
+                GROUP_PATH = txt_grouppath.Text;
+                rtxt_groups.Clear();
+                LoadListGroup();
+                RenderGroup();
+            }
+
+        }
+
+        private void btn_selectLD_Click(object sender, EventArgs e)
+        {
+            string folderPath = "";
+            FolderBrowserDialog directchoosedlg = new FolderBrowserDialog();
+            if (directchoosedlg.ShowDialog() == DialogResult.OK)
+            {
+                folderPath = directchoosedlg.SelectedPath;
+            }
+            txt_ldplayer_path.Text = folderPath;
+            if(!String.IsNullOrEmpty(txt_ldplayer_path.Text.Trim()))
+            {
+                LDPLAYER_FOLDER_PATH = txt_ldplayer_path.Text;
+            }
+        }
+
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+            ThreadPerRound = (int)numericUpDown1.Value;
+        }
+
+        #endregion
+
+        // ========================================== METHOD ==========================================
+        #region method
 
         public static int GetRandomNumber(int min, int max)
         {
@@ -55,25 +162,25 @@ namespace AutoTele
             {
                 case 1:
                     // do something
-                    AutoJoinGr_Chat(deviceId,0);
+                    AutoJoinGr_Chat(deviceId, 0);
                     break;
                 case 2:
                     // do something
-                    AutoJoinGr_Chat(deviceId,0);
+                    AutoJoinGr_Chat(deviceId, 0);
                     break;
                 default:
                     break;
             }
             Thread.Sleep(sleepTime);
             return randomAction;
-            
+
         }
 
-       
 
-        private List<string> GetListUsernam(String dir)
+
+        private List<string> TXTReader(String dir)
         {
-            
+
             try
             {
                 string[] lines = File.ReadAllLines(dir);
@@ -90,44 +197,40 @@ namespace AutoTele
             return null;
         }
 
-        private void button2_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                String ldpath = "C:\\LDPlayer\\ldmutiplayer\\dnmultiplayerex.exe";
+        //private void button2_Click(object sender, EventArgs e)
+        //{
+        //    try
+        //    {
+        //        String ldpath = "C:\\LDPlayer\\ldmutiplayer\\dnmultiplayerex.exe";
 
-                if(ldpath != null)
-                {
-                    Process ldplayer = new Process();
-                    ldplayer.StartInfo.FileName = ldpath;
-                    ldplayer.Start();
-                }
-                else
-                {
-                    MessageBox.Show("Please install LDPlayer first!");
-                }
-
-
-            }catch(Exception ex)
-            {
-                MessageBox.Show("Error: " + ex.Message);
-            }
-
-            // start first ldplayer
+        //        if (ldpath != null)
+        //        {
+        //            Process ldplayer = new Process();
+        //            ldplayer.StartInfo.FileName = ldpath;
+        //            ldplayer.Start();
+        //        }
+        //        else
+        //        {
+        //            MessageBox.Show("Please install LDPlayer first!");
+        //        }
 
 
-            
-        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show("Error: " + ex.Message);
+        //    }
+        //}
 
-
-        private async void btn_createNew_Click(object sender, EventArgs e)
-        {
-
-            Task.Run(() => startMultiThread());
-        }
 
         private async void startMultiThread()
         {
+            int deviceCount = LDInstanceNames.Count;
+            if(deviceCount == 0)
+            {
+                MessageBox.Show("Please open LDPlayer first!");
+                return;
+            }
             int numberOfRound = 2;/*(int)LDInstanceNames.Count / ThreadPerRound;*/
             isRunning = true;
 
@@ -189,18 +292,21 @@ namespace AutoTele
             {
                 rtxt_console.AppendText("All done...\n");
             });
+
+            closeAll();
         }
 
 
         private void OpenLDPlayer(String device)
         {
-            string targetDir = @"C:\LDPlayer\LDPlayer9"; // Replace with your target directory path
-            string command = "launchex --name "+device+" --packagename org.telegram.messenger.web"; // Replace with your actual command
+
+            string targetDir = LDPLAYER_FOLDER_PATH; 
+            string command = "launchex --name " + device + " --packagename org.telegram.messenger.web"; 
 
             Process process = new Process();
             process.StartInfo.FileName = targetDir + @"\ldconsole.exe";
             process.StartInfo.Arguments = command;
-            process.StartInfo.WorkingDirectory = null; // Use current directory
+            process.StartInfo.WorkingDirectory = null;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.UseShellExecute = false;
 
@@ -223,43 +329,50 @@ namespace AutoTele
 
         private void getListNameLDPlayer()
         {
-            
-            string targetDir = @"C:\LDPlayer\LDPlayer9"; // Replace with your target directory path
-            string command = "list"; // Replace with your actual command
 
-            Process process = new Process();
-            process.StartInfo.FileName = targetDir + @"\ldconsole.exe";
-            process.StartInfo.Arguments = command;
-            process.StartInfo.WorkingDirectory = null; // Use current directory
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.UseShellExecute = false;
-
-            process.Start();
-
-            StreamReader reader = process.StandardOutput;
-            string outputLine;
-            while ((outputLine = reader.ReadLine()) != null)
+            try
             {
-                LDInstanceNames.Add(outputLine);
+                string targetDir = LDPLAYER_FOLDER_PATH;
+                string command = "list";
+
+                Process process = new Process();
+                process.StartInfo.FileName = targetDir + @"\ldconsole.exe";
+                process.StartInfo.Arguments = command;
+                process.StartInfo.WorkingDirectory = null;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.UseShellExecute = false;
+
+                process.Start();
+
+                StreamReader reader = process.StandardOutput;
+                string outputLine;
+                while ((outputLine = reader.ReadLine()) != null)
+                {
+                    LDInstanceNames.Add(outputLine);
+                }
+
+                process.WaitForExit();
+
+                if (process.ExitCode != 0)
+                {
+                    Console.WriteLine("Error: Process exited with code " + process.ExitCode);
+                }
             }
-
-            process.WaitForExit();
-
-            if (process.ExitCode != 0)
+            catch (Exception ex)
             {
-                Console.WriteLine("Error: Process exited with code " + process.ExitCode);
+                Console.WriteLine("LDPlayer had not a instance take correct LDPlayer path");
             }
         }
 
         private void closeAll()
         {
-            string targetDir = @"C:\LDPlayer\LDPlayer9"; // Replace with your target directory path
-            string command = "quitall"; // Replace with your actual command
+            string targetDir = LDPLAYER_FOLDER_PATH;
+            string command = "quitall";
 
             Process process = new Process();
             process.StartInfo.FileName = targetDir + @"\ldconsole.exe";
             process.StartInfo.Arguments = command;
-            process.StartInfo.WorkingDirectory = null; // Use current directory
+            process.StartInfo.WorkingDirectory = null;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.UseShellExecute = false;
 
@@ -298,26 +411,10 @@ namespace AutoTele
             dtgv_device_account.DataSource = dt;
         }
 
-        private void dtgv_device_account_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-            
-        }
 
-        private void dtgv_device_account_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-        }
 
-        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            isRunning = false;
-        }
 
-        private void btn_end_Click(object sender, EventArgs e)
-        {
-            isRunning = false;
-        }
-
-        public async void AutoJoinGr_Chat(String deviceID,int i)
+        public async void AutoJoinGr_Chat(String deviceID, int i)
         {
             if (i == 4)
             {
@@ -359,15 +456,126 @@ namespace AutoTele
                 else
                 {
                     KAutoHelper.ADBHelper.Tap(deviceID, 71, 155);
-                    AutoJoinGr_Chat(deviceID,i+1);
+                    AutoJoinGr_Chat(deviceID, i + 1);
                 }
 
             }
             else
             {
                 Console.WriteLine("Cannot click on the gr_chat icon");
-                AutoJoinGr_Chat(deviceID,i+1);
+                AutoJoinGr_Chat(deviceID, i + 1);
             }
         }
+
+        private void LoadListChat()
+        {
+            listChat = TXTReader(CHAT_PATH);
+
+        }
+
+        private void LoadListGroup()
+        {
+            listGr = TXTReader(GROUP_PATH);
+        }
+
+        public bool autoInstallTelegram(String deviceID)
+        {
+            string command = "adb -s " + deviceID + " install Telegram.apk";
+
+            String result = ExecuteCMD(command).Replace(command, "");
+            if (result.Contains("Success"))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public bool IsInstalledTelegram(String deviceID)
+        {
+            string command = "adb -s " + deviceID + " shell pm list packages | findstr org.telegram.messenger.web";
+
+            String result = ExecuteCMD(command).Replace(command, "");
+            if (result.Contains("org.telegram.messenger.web"))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public String ExecuteCMD(string cmdCommand)
+        {
+            try
+            {
+                Process process = new Process();
+                ProcessStartInfo processStartInfo = new ProcessStartInfo();
+                processStartInfo.WorkingDirectory = ADB_FOLDER_PATH;
+                processStartInfo.FileName = "cmd.exe";
+                processStartInfo.CreateNoWindow = true;
+                processStartInfo.UseShellExecute = false;
+                processStartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                processStartInfo.RedirectStandardInput = true;
+                processStartInfo.RedirectStandardOutput = true;
+                processStartInfo.Verb = "runas";
+                process.StartInfo = processStartInfo;
+                process.Start();
+                process.StandardInput.WriteLine(cmdCommand);
+                process.StandardInput.Flush();
+                process.StandardInput.Close();
+                process.WaitForExit();
+                return process.StandardOutput.ReadToEnd();
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+
+        public void InstallTelegramForAllDevices()
+        {
+            List<String> devices = KAutoHelper.ADBHelper.GetDevices();
+            foreach (String device in devices)
+            {
+                if (!IsInstalledTelegram(device))
+                {
+                    if (autoInstallTelegram(device))
+                    {
+                        MessageBox.Show("Install success on " + device);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Install failed on " + device);
+                    }
+                }
+            }
+        }
+
+        public void RenderChat()
+        {
+            if (listChat.Count > 0)
+                foreach (String chat in listChat)
+                {
+                    rtxt_chats.AppendText(chat + "\n");
+                }
+        }
+
+        public void RenderGroup()
+        {
+            if (listGr.Count > 0)
+                foreach (String group in listGr)
+                {
+                    rtxt_groups.AppendText(group + "\n");
+                }
+        }
+
+
+
+
+        #endregion
+
+        
     }
 }
