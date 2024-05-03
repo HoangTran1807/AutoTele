@@ -47,17 +47,27 @@
             this.btn_Start = new System.Windows.Forms.Button();
             this.dtgv_device_account = new System.Windows.Forms.DataGridView();
             this.rtxt_console = new System.Windows.Forms.RichTextBox();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.toolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.installTeleForAllDeviceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.btn_selectedLD = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dtgv_device_account)).BeginInit();
+            this.menuStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.btn_selectedLD);
+            this.panel1.Controls.Add(this.dataGridView1);
             this.panel1.Controls.Add(this.panel2);
             this.panel1.Controls.Add(this.dtgv_device_account);
             this.panel1.Controls.Add(this.rtxt_console);
+            this.panel1.Controls.Add(this.menuStrip1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
@@ -82,9 +92,9 @@
             this.panel2.Controls.Add(this.label1);
             this.panel2.Controls.Add(this.numericUpDown1);
             this.panel2.Controls.Add(this.btn_Start);
-            this.panel2.Location = new System.Drawing.Point(9, 18);
+            this.panel2.Location = new System.Drawing.Point(9, 44);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(522, 556);
+            this.panel2.Size = new System.Drawing.Size(522, 530);
             this.panel2.TabIndex = 23;
             // 
             // rtxt_groups
@@ -242,18 +252,62 @@
             // 
             this.dtgv_device_account.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dtgv_device_account.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dtgv_device_account.Location = new System.Drawing.Point(818, 18);
+            this.dtgv_device_account.Location = new System.Drawing.Point(818, 44);
             this.dtgv_device_account.Name = "dtgv_device_account";
-            this.dtgv_device_account.Size = new System.Drawing.Size(272, 557);
+            this.dtgv_device_account.Size = new System.Drawing.Size(272, 238);
             this.dtgv_device_account.TabIndex = 22;
             // 
             // rtxt_console
             // 
-            this.rtxt_console.Location = new System.Drawing.Point(541, 18);
+            this.rtxt_console.Location = new System.Drawing.Point(541, 44);
             this.rtxt_console.Name = "rtxt_console";
-            this.rtxt_console.Size = new System.Drawing.Size(271, 557);
+            this.rtxt_console.Size = new System.Drawing.Size(271, 531);
             this.rtxt_console.TabIndex = 21;
             this.rtxt_console.Text = "";
+            // 
+            // menuStrip1
+            // 
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(1098, 24);
+            this.menuStrip1.TabIndex = 24;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // toolToolStripMenuItem
+            // 
+            this.toolToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.installTeleForAllDeviceToolStripMenuItem});
+            this.toolToolStripMenuItem.Name = "toolToolStripMenuItem";
+            this.toolToolStripMenuItem.Size = new System.Drawing.Size(50, 20);
+            this.toolToolStripMenuItem.Text = "Menu";
+            // 
+            // installTeleForAllDeviceToolStripMenuItem
+            // 
+            this.installTeleForAllDeviceToolStripMenuItem.Name = "installTeleForAllDeviceToolStripMenuItem";
+            this.installTeleForAllDeviceToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
+            this.installTeleForAllDeviceToolStripMenuItem.Text = "install tele for all device";
+            this.installTeleForAllDeviceToolStripMenuItem.Click += new System.EventHandler(this.installTeleForAllDeviceToolStripMenuItem_Click);
+            // 
+            // dataGridView1
+            // 
+            this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.Location = new System.Drawing.Point(818, 337);
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.Size = new System.Drawing.Size(272, 238);
+            this.dataGridView1.TabIndex = 25;
+            // 
+            // btn_selectedLD
+            // 
+            this.btn_selectedLD.Location = new System.Drawing.Point(910, 299);
+            this.btn_selectedLD.Name = "btn_selectedLD";
+            this.btn_selectedLD.Size = new System.Drawing.Size(102, 23);
+            this.btn_selectedLD.TabIndex = 26;
+            this.btn_selectedLD.Text = "selected";
+            this.btn_selectedLD.UseVisualStyleBackColor = true;
+            this.btn_selectedLD.Click += new System.EventHandler(this.btn_selectedLD_Click);
             // 
             // Form1
             // 
@@ -261,16 +315,21 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1098, 593);
             this.Controls.Add(this.panel1);
+            this.MainMenuStrip = this.menuStrip1;
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Form1";
             this.Text = "Form1";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dtgv_device_account)).EndInit();
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -296,6 +355,11 @@
         private System.Windows.Forms.RichTextBox rtxt_console;
         private System.Windows.Forms.RichTextBox rtxt_groups;
         private System.Windows.Forms.RichTextBox rtxt_chats;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem toolToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem installTeleForAllDeviceToolStripMenuItem;
+        private System.Windows.Forms.Button btn_selectedLD;
+        private System.Windows.Forms.DataGridView dataGridView1;
     }
 }
 

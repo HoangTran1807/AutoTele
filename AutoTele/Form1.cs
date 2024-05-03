@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Menu;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
 
 namespace AutoTele
@@ -22,15 +23,21 @@ namespace AutoTele
     {
         // ========================================== VARIABLE ==========================================
         #region variable
-        int ThreadPerRound = 3;
-        List<String> LDInstanceNames = new List<string>();
-        List<String> ListUsername = new List<string>();
+        int ThreadPerRound = 0;
+
         private static readonly ThreadLocal<Random> threadLocalRandom = new ThreadLocal<Random>(() => new Random(Guid.NewGuid().GetHashCode()));
         static bool isRunning = false;
 
-        Bitmap gr_chat = (Bitmap)Image.FromFile("data//gr_chat.png");
-        Bitmap disablesend = (Bitmap)Image.FromFile("data//disablesend.png");
+        private static readonly Random random = new Random();
 
+       Bitmap gr_chat = (Bitmap)Image.FromFile("data//gr_chat.png");
+        Bitmap disablesend = (Bitmap)Image.FromFile("data//disablesend.png");
+        Bitmap dropdown = (Bitmap)Image.FromFile("data//dropdown.png");
+        Bitmap login = (Bitmap)Image.FromFile("data//login.png");
+
+        List<String> LDInstanceNames = new List<string>();
+        List<String> SelectedLD = new List<string>();
+        List<String> ListUsername = new List<string>();
         List<String> listChat = new List<string>();
         List<String> listGr = new List<string>();
         #endregion
@@ -41,6 +48,11 @@ namespace AutoTele
         String LDPLAYER_FOLDER_PATH = @"C:\LDPlayer\LDPlayer9";
         String CHAT_PATH = "";
         String GROUP_PATH = "";
+        #endregion
+
+        #region CountDown
+        int TIME_WAIT_DRIVER = 12; // 12 * 10000
+        int TIME_WAIT_TELEGRAM = 10; // 10 * 10000
         #endregion
 
 
@@ -56,8 +68,6 @@ namespace AutoTele
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            getListNameLDPlayer();
-            LoadData();
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
@@ -67,11 +77,17 @@ namespace AutoTele
 
         private void btn_Start_Click(object sender, EventArgs e)
         {
+            if(ThreadPerRound == 0)
+            {
+                MessageBox.Show("Please input number of thread per round");
+                return;
+            }
             Task.Run(() => startMultiThread());
         }
         private void btn_end_Click(object sender, EventArgs e)
         {
             isRunning = false;
+            MessageBox.Show("process will be stopped after all threads are done");
         }
 
         public void btn_checkTele_Click(object sender, EventArgs e)
@@ -136,6 +152,8 @@ namespace AutoTele
             if(!String.IsNullOrEmpty(txt_ldplayer_path.Text.Trim()))
             {
                 LDPLAYER_FOLDER_PATH = txt_ldplayer_path.Text;
+                getListNameLDPlayer();
+
             }
         }
 
@@ -162,11 +180,11 @@ namespace AutoTele
             {
                 case 1:
                     // do something
-                    AutoJoinGr_Chat(deviceId, 0);
+                    AutoJoinGr_Chat(deviceId, 0,1,true);
                     break;
                 case 2:
                     // do something
-                    AutoJoinGr_Chat(deviceId, 0);
+                    AutoJoinGr_Chat(deviceId, 0,1,true);
                     break;
                 default:
                     break;
@@ -225,17 +243,20 @@ namespace AutoTele
 
         private async void startMultiThread()
         {
-            int deviceCount = LDInstanceNames.Count;
-            if(deviceCount == 0)
+            int deviceCount = SelectedLD.Count;
+            // return if no device is selected
+            if (deviceCount == 0)
             {
                 MessageBox.Show("Please open LDPlayer first!");
                 return;
             }
-            int numberOfRound = 2;/*(int)LDInstanceNames.Count / ThreadPerRound;*/
+
+            int numberOfRound = deviceCount / ThreadPerRound;
             isRunning = true;
 
             for (int i = 0; i < numberOfRound; i++)
             {
+                // exit if stop button is clicked
                 if (!isRunning)
                 {
                     break;
@@ -245,22 +266,35 @@ namespace AutoTele
                 closeAll();
                 for (int j = startIndex; j < endIndex; j++)
                 {
-                    OpenLDPlayer(LDInstanceNames[j]);
+                    OpenLDPlayer(SelectedLD[j]);
                     this.Invoke((MethodInvoker)delegate
                     {
-                        rtxt_console.AppendText(LDInstanceNames[j] + " is opened...\n");
+                        rtxt_console.AppendText(SelectedLD[j] + " is opened...\n");
                     });
-                    Thread.Sleep(6000);
                 }
-                Thread.Sleep(120000);
-                List<String> devices = KAutoHelper.ADBHelper.GetDevices();
-                List<Task> tasks = new List<Task>();
-                foreach (String device in devices)
+
+                int numberOfDevice = ((endIndex > deviceCount) ? deviceCount : endIndex) - startIndex;
+                List<String> devices = new List<String>();
+                int count = 0;
+                while (devices.Count < numberOfDevice)
                 {
-                    if (String.IsNullOrEmpty(device))
+                    if (count >= TIME_WAIT_DRIVER)
                     {
                         break;
                     }
+                    devices = KAutoHelper.ADBHelper.GetDevices();
+                    Thread.Sleep(10000);
+                    Console.WriteLine("Waiting for devices all device online");
+                    count++;
+                }
+
+                List<Task> tasks = new List<Task>();
+                foreach (String device in devices)
+                {
+                    // exit if no device
+                    if (String.IsNullOrEmpty(device))
+                        break;
+                    // run if device is not installed telegram
                     tasks.Add(Task.Run(() =>
                     {
                         this.Invoke((MethodInvoker)delegate
@@ -296,6 +330,108 @@ namespace AutoTele
             closeAll();
         }
 
+        private async void InstallTeleForAll()
+        {
+            
+            int deviceCount = SelectedLD.Count;
+            // return if no device is selected
+            if (deviceCount == 0)
+            {
+                MessageBox.Show("Please open LDPlayer first!");
+                return;
+            }
+
+            int numberOfRound = deviceCount / ThreadPerRound;
+            isRunning = true;
+
+            for (int i = 0; i < numberOfRound; i++)
+            {
+                // exit if stop button is clicked
+                if (!isRunning)
+                {
+                    break;
+                }
+                int startIndex = i * ThreadPerRound;
+                int endIndex = (i + 1) * ThreadPerRound;
+                closeAll();
+                for (int j = startIndex; j < endIndex; j++)
+                {
+                    OpenLDPlayer(SelectedLD[j]);
+                    this.Invoke((MethodInvoker)delegate
+                    {
+                        rtxt_console.AppendText(SelectedLD[j] + " is opened...\n");
+                    });
+                }
+
+                int numberOfDevice = ((endIndex > deviceCount) ? deviceCount : endIndex) - startIndex;
+                List<String> devices = new List<String>();
+                int count = 0;
+                while (devices.Count < numberOfDevice)
+                {
+                    if(count >= TIME_WAIT_DRIVER)
+                    {
+                        break;
+                    }
+                    devices = KAutoHelper.ADBHelper.GetDevices();
+                    Thread.Sleep(10000);
+                    Console.WriteLine("Waiting for devices all device online");
+                    count++;
+                }
+                
+                List<Task> tasks = new List<Task>();
+                foreach (String device in devices)
+                {
+                    // exit if no device
+                    if (String.IsNullOrEmpty(device))
+                        break;
+                    // run if device is not installed telegram
+                    tasks.Add(Task.Run(() =>
+                    {
+                        Console.WriteLine(device + "is online");
+                        if(!IsInstalledTelegram(device))
+                        {
+                            int ncount = 0;
+                            autoInstallTelegram(device);
+                            while(!IsInstalledTelegram(device))
+                            {
+                                if(ncount >= TIME_WAIT_TELEGRAM)
+                                {
+                                    break;
+                                }
+                                Thread.Sleep(1000);
+                                ncount++;
+                            }
+                        }
+                        if(IsInstalledTelegram(device))
+                        {
+                            this.Invoke((MethodInvoker)delegate
+                            {
+                                rtxt_console.AppendText(device + " is installed...\n");
+                            });
+                        }
+                        else
+                        {
+                            this.Invoke((MethodInvoker)delegate
+                            {
+                                rtxt_console.AppendText(device + " is not installed...\n");
+                            });
+                        }
+                    }));
+                }
+                await Task.WhenAll(tasks);
+                this.Invoke((MethodInvoker)delegate
+                {
+                    rtxt_console.AppendText("Round " + i + " is done...\n");
+                });
+            }
+
+            this.Invoke((MethodInvoker)delegate
+            {
+                rtxt_console.AppendText("All done...\n");
+            });
+
+            closeAll();
+        }
 
         private void OpenLDPlayer(String device)
         {
@@ -332,6 +468,7 @@ namespace AutoTele
 
             try
             {
+                
                 string targetDir = LDPLAYER_FOLDER_PATH;
                 string command = "list";
 
@@ -346,11 +483,12 @@ namespace AutoTele
 
                 StreamReader reader = process.StandardOutput;
                 string outputLine;
+                LDInstanceNames.Clear();
                 while ((outputLine = reader.ReadLine()) != null)
                 {
                     LDInstanceNames.Add(outputLine);
                 }
-
+                RenderLDInstance();
                 process.WaitForExit();
 
                 if (process.ExitCode != 0)
@@ -382,7 +520,6 @@ namespace AutoTele
             string outputLine;
             while ((outputLine = reader.ReadLine()) != null)
             {
-                LDInstanceNames.Add(outputLine);
             }
 
             process.WaitForExit();
@@ -394,17 +531,19 @@ namespace AutoTele
         }
 
 
-        private void LoadData()
+        private void RenderLDInstance()
         {
             DataTable dt = new DataTable();
             dt.Columns.Add("DeviceName");
             dt.Columns.Add("UserName");
+            dt.Columns.Add("Select", typeof(bool));
 
             foreach (String device in LDInstanceNames)
             {
                 DataRow row = dt.NewRow();
                 row["DeviceName"] = device;
                 row["UserName"] = "Hoang";
+                row["Select"] = false;
                 dt.Rows.Add(row);
             }
 
@@ -414,16 +553,51 @@ namespace AutoTele
 
 
 
-        public async void AutoJoinGr_Chat(String deviceID, int i)
+        //i là biến để tính số lần lặp mặc định truyền vô là 0, numberacc là số thứ tự tài khoản mặc định truyền vô là 1, switchacc mặc định truyền vô là true
+        public async void AutoJoinGr_Chat(String deviceID, int i, int numberAcc, bool switchacc)
         {
-            if (i == 4)
+            //check thu tu tai khoan
+            if (numberAcc > 3)
             {
                 return;
             }
+
+            //check so lan chat của từng tai khoan
+            if (i >= 4)
+            {
+                AutoJoinGr_Chat(deviceID, 0, numberAcc + 1, true);
+                return;
+            }
+            proc task1 = new proc();
+
+            //check có cần đổi tài khoản hay ko
+            if (switchacc == true)
+            {
+                KAutoHelper.ADBHelper.Tap(deviceID, 71, 155);
+                KAutoHelper.ADBHelper.Delay(7000);
+                task1.clickChildImage(dropdown, deviceID);
+                KAutoHelper.ADBHelper.Delay(2000);
+                switch (numberAcc)
+                {
+                    case 1:
+                        KAutoHelper.ADBHelper.Tap(deviceID, 305, 610);
+                        break;
+                    case 2:
+                        KAutoHelper.ADBHelper.Tap(deviceID, 302, 763);
+                        break;
+                    case 3:
+                        KAutoHelper.ADBHelper.Tap(deviceID, 413, 912);
+                        break;
+                    default:
+                        return;
+                }
+                KAutoHelper.ADBHelper.Delay(2000);
+            }
             KAutoHelper.ADBHelper.Tap(deviceID, 998, 145);
-            //string[] gr = { "cryto gr", "freefire", "riot", "alumine", "golden star", "doremon" };
-            string[] gr = { "cryto gr", "freefire", "riot", "alumine" };
-            string[] chat = { "hi", "how are u", "lol", "haha", "555", "tui la con cho ngu" };
+
+            string[] gr = { "cryto gr", "freefire", "riot", "alumine", "golden star", "doremon" };
+            string[] chat = { "kkkk", "Hello", "hi", "how are u", "lol", "haha", "555", "tui la con cho ngu" };
+
             // Tạo một đối tượng Random
             Random rand = new Random();
 
@@ -434,38 +608,51 @@ namespace AutoTele
             // Lấy phần tử tại chỉ mục đã chọn
             string choosegr = gr[indexgr];
             string choosechat = chat[indexchat];
+
+
             KAutoHelper.ADBHelper.InputText(deviceID, choosegr);
-            KAutoHelper.ADBHelper.Delay(2000);
-            proc task1 = new proc();
-            // click on the gr_chat icon
+            KAutoHelper.ADBHelper.Delay(7000);
+            // tìm gr chat 
             if (task1.clickChildImage(gr_chat, deviceID))
             {
+                KAutoHelper.ADBHelper.Delay(7000);
+                Bitmap screen1 = KAutoHelper.ADBHelper.ScreenShoot(deviceID);
+                Point? checklogin = task1.FindOutPoint(screen1, login);
+                if (checklogin != null)
+                {
+                    return;
+                }
                 Console.WriteLine("Click on the gr_chat icon");
                 KAutoHelper.ADBHelper.Delay(2000);
                 KAutoHelper.ADBHelper.Tap(deviceID, 530, 1852);
-                KAutoHelper.ADBHelper.Delay(5000);
-                Bitmap screen = KAutoHelper.ADBHelper.ScreenShoot(deviceID);
-                screen.Save("aa.png");
-                Point? checkdisable = task1.FindOutPoint(screen, disablesend);
+                KAutoHelper.ADBHelper.Delay(10000);
+                Bitmap screen2 = KAutoHelper.ADBHelper.ScreenShoot(deviceID);
+                Point? checkdisable = task1.FindOutPoint(screen2, disablesend);
                 if (checkdisable == null)
                 {
+                    KAutoHelper.ADBHelper.Delay(random.Next(10000, 30001));
                     KAutoHelper.ADBHelper.Tap(deviceID, 276, 1855);
                     KAutoHelper.ADBHelper.InputText(deviceID, choosechat);
                     KAutoHelper.ADBHelper.Tap(deviceID, 1004, 1842);
+                    KAutoHelper.ADBHelper.Delay(2000);
+                    KAutoHelper.ADBHelper.Tap(deviceID, 71, 155);
+                    KAutoHelper.ADBHelper.Delay(random.Next(120000, 300000));
+                    AutoJoinGr_Chat(deviceID, i + 1, numberAcc, false);
                 }
                 else
                 {
                     KAutoHelper.ADBHelper.Tap(deviceID, 71, 155);
-                    AutoJoinGr_Chat(deviceID, i + 1);
+                    AutoJoinGr_Chat(deviceID, i + 1, numberAcc, false);
                 }
 
             }
             else
             {
                 Console.WriteLine("Cannot click on the gr_chat icon");
-                AutoJoinGr_Chat(deviceID, i + 1);
+                AutoJoinGr_Chat(deviceID, i + 1, numberAcc, false);
             }
         }
+
 
         private void LoadListChat()
         {
@@ -574,8 +761,37 @@ namespace AutoTele
 
 
 
+
+
         #endregion
 
-        
+        private void installTeleForAllDeviceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (ThreadPerRound == 0)
+            {
+                MessageBox.Show("Please input number of thread per round");
+                return;
+            }
+            Task.Run(() => InstallTeleForAll());
+        }
+
+        private void btn_selectedLD_Click(object sender, EventArgs e)
+        {
+            DataTable dt = new DataTable();
+            dt.Columns.Add("DeviceName");
+            SelectedLD.Clear();
+            foreach (DataGridViewRow row in dtgv_device_account.Rows)
+            {
+                // Kiểm tra xem dòng hiện tại có được chọn không
+                DataGridViewCheckBoxCell cell = row.Cells["Select"] as DataGridViewCheckBoxCell;
+                if (cell != null && cell.Value != null && (bool)cell.Value == true)
+                {
+                    // Lấy giá trị của cột "DeviceName" và in ra console
+                    SelectedLD.Add(row.Cells["DeviceName"].Value.ToString());
+                    dt.Rows.Add(row.Cells["DeviceName"].Value.ToString());
+                }
+            }
+            dataGridView1.DataSource = dt;
+        }
     }
 }
