@@ -29,6 +29,10 @@
         private void InitializeComponent()
         {
             this.panel1 = new System.Windows.Forms.Panel();
+            this.btn_ignoreLD = new System.Windows.Forms.Button();
+            this.btn_selectedAll = new System.Windows.Forms.Button();
+            this.btn_selectedLD = new System.Windows.Forms.Button();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.panel2 = new System.Windows.Forms.Panel();
             this.rtxt_groups = new System.Windows.Forms.RichTextBox();
             this.rtxt_chats = new System.Windows.Forms.RichTextBox();
@@ -50,20 +54,21 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.toolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.installTeleForAllDeviceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.btn_selectedLD = new System.Windows.Forms.Button();
             this.configForAllDeviceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.btn_selectedAll = new System.Windows.Forms.Button();
+            this.addMoreInstanceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.eixtToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dtgv_device_account)).BeginInit();
             this.menuStrip1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
             // panel1
             // 
+            this.panel1.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.panel1.Controls.Add(this.btn_ignoreLD);
             this.panel1.Controls.Add(this.btn_selectedAll);
             this.panel1.Controls.Add(this.btn_selectedLD);
             this.panel1.Controls.Add(this.dataGridView1);
@@ -76,6 +81,49 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1098, 593);
             this.panel1.TabIndex = 0;
+            // 
+            // btn_ignoreLD
+            // 
+            this.btn_ignoreLD.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
+            this.btn_ignoreLD.Location = new System.Drawing.Point(820, 297);
+            this.btn_ignoreLD.Name = "btn_ignoreLD";
+            this.btn_ignoreLD.Size = new System.Drawing.Size(76, 34);
+            this.btn_ignoreLD.TabIndex = 28;
+            this.btn_ignoreLD.Text = "Ignore All";
+            this.btn_ignoreLD.UseVisualStyleBackColor = false;
+            this.btn_ignoreLD.Click += new System.EventHandler(this.btn_ignoreLD_Click);
+            // 
+            // btn_selectedAll
+            // 
+            this.btn_selectedAll.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.btn_selectedAll.Location = new System.Drawing.Point(1008, 297);
+            this.btn_selectedAll.Name = "btn_selectedAll";
+            this.btn_selectedAll.Size = new System.Drawing.Size(80, 34);
+            this.btn_selectedAll.TabIndex = 27;
+            this.btn_selectedAll.Text = "Select All";
+            this.btn_selectedAll.UseVisualStyleBackColor = false;
+            this.btn_selectedAll.Click += new System.EventHandler(this.btn_selectedAll_Click);
+            // 
+            // btn_selectedLD
+            // 
+            this.btn_selectedLD.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+            this.btn_selectedLD.Location = new System.Drawing.Point(914, 297);
+            this.btn_selectedLD.Name = "btn_selectedLD";
+            this.btn_selectedLD.Size = new System.Drawing.Size(76, 34);
+            this.btn_selectedLD.TabIndex = 26;
+            this.btn_selectedLD.Text = "Select";
+            this.btn_selectedLD.UseVisualStyleBackColor = false;
+            this.btn_selectedLD.Click += new System.EventHandler(this.btn_selectedLD_Click);
+            // 
+            // dataGridView1
+            // 
+            this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.Location = new System.Drawing.Point(818, 337);
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.ReadOnly = true;
+            this.dataGridView1.Size = new System.Drawing.Size(272, 238);
+            this.dataGridView1.TabIndex = 25;
             // 
             // panel2
             // 
@@ -120,12 +168,13 @@
             // 
             // btn_selectLD
             // 
+            this.btn_selectLD.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.btn_selectLD.Location = new System.Drawing.Point(388, 405);
             this.btn_selectLD.Name = "btn_selectLD";
             this.btn_selectLD.Size = new System.Drawing.Size(75, 23);
             this.btn_selectLD.TabIndex = 19;
-            this.btn_selectLD.Text = "select path";
-            this.btn_selectLD.UseVisualStyleBackColor = true;
+            this.btn_selectLD.Text = "Choose file";
+            this.btn_selectLD.UseVisualStyleBackColor = false;
             this.btn_selectLD.Click += new System.EventHandler(this.btn_selectLD_Click);
             // 
             // txt_ldplayer_path
@@ -147,12 +196,13 @@
             // 
             // btn_selectGroupPath
             // 
+            this.btn_selectGroupPath.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.btn_selectGroupPath.Location = new System.Drawing.Point(388, 484);
             this.btn_selectGroupPath.Name = "btn_selectGroupPath";
             this.btn_selectGroupPath.Size = new System.Drawing.Size(75, 23);
             this.btn_selectGroupPath.TabIndex = 16;
-            this.btn_selectGroupPath.Text = "select path";
-            this.btn_selectGroupPath.UseVisualStyleBackColor = true;
+            this.btn_selectGroupPath.Text = "Choose file";
+            this.btn_selectGroupPath.UseVisualStyleBackColor = false;
             this.btn_selectGroupPath.Click += new System.EventHandler(this.btn_selectGroupPath_Click);
             // 
             // txt_grouppath
@@ -174,12 +224,13 @@
             // 
             // btn_selectChatPath
             // 
+            this.btn_selectChatPath.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.btn_selectChatPath.Location = new System.Drawing.Point(388, 443);
             this.btn_selectChatPath.Name = "btn_selectChatPath";
             this.btn_selectChatPath.Size = new System.Drawing.Size(75, 23);
             this.btn_selectChatPath.TabIndex = 13;
-            this.btn_selectChatPath.Text = "select path";
-            this.btn_selectChatPath.UseVisualStyleBackColor = true;
+            this.btn_selectChatPath.Text = "Choose file";
+            this.btn_selectChatPath.UseVisualStyleBackColor = false;
             this.btn_selectChatPath.Click += new System.EventHandler(this.btn_selectChatPath_Click);
             // 
             // txt_chatpath
@@ -201,12 +252,13 @@
             // 
             // btn_end
             // 
+            this.btn_end.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
             this.btn_end.Location = new System.Drawing.Point(146, 19);
             this.btn_end.Name = "btn_end";
-            this.btn_end.Size = new System.Drawing.Size(75, 23);
+            this.btn_end.Size = new System.Drawing.Size(76, 34);
             this.btn_end.TabIndex = 9;
             this.btn_end.Text = "stop";
-            this.btn_end.UseVisualStyleBackColor = true;
+            this.btn_end.UseVisualStyleBackColor = false;
             this.btn_end.Click += new System.EventHandler(this.btn_end_Click);
             // 
             // label1
@@ -243,12 +295,13 @@
             // 
             // btn_Start
             // 
+            this.btn_Start.BackColor = System.Drawing.Color.SkyBlue;
             this.btn_Start.Location = new System.Drawing.Point(40, 19);
             this.btn_Start.Name = "btn_Start";
-            this.btn_Start.Size = new System.Drawing.Size(82, 23);
+            this.btn_Start.Size = new System.Drawing.Size(76, 34);
             this.btn_Start.TabIndex = 2;
             this.btn_Start.Text = "Start";
-            this.btn_Start.UseVisualStyleBackColor = true;
+            this.btn_Start.UseVisualStyleBackColor = false;
             this.btn_Start.Click += new System.EventHandler(this.btn_Start_Click);
             // 
             // dtgv_device_account
@@ -262,16 +315,21 @@
             // 
             // rtxt_console
             // 
+            this.rtxt_console.BackColor = System.Drawing.SystemColors.MenuText;
+            this.rtxt_console.ForeColor = System.Drawing.SystemColors.Window;
             this.rtxt_console.Location = new System.Drawing.Point(541, 44);
             this.rtxt_console.Name = "rtxt_console";
+            this.rtxt_console.ReadOnly = true;
             this.rtxt_console.Size = new System.Drawing.Size(271, 531);
             this.rtxt_console.TabIndex = 21;
             this.rtxt_console.Text = "";
             // 
             // menuStrip1
             // 
+            this.menuStrip1.BackColor = System.Drawing.Color.LightSkyBlue;
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolToolStripMenuItem});
+            this.toolToolStripMenuItem,
+            this.eixtToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(1098, 24);
@@ -282,7 +340,8 @@
             // 
             this.toolToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.installTeleForAllDeviceToolStripMenuItem,
-            this.configForAllDeviceToolStripMenuItem});
+            this.configForAllDeviceToolStripMenuItem,
+            this.addMoreInstanceToolStripMenuItem});
             this.toolToolStripMenuItem.Name = "toolToolStripMenuItem";
             this.toolToolStripMenuItem.Size = new System.Drawing.Size(50, 20);
             this.toolToolStripMenuItem.Text = "Menu";
@@ -294,25 +353,6 @@
             this.installTeleForAllDeviceToolStripMenuItem.Text = "install tele for all device";
             this.installTeleForAllDeviceToolStripMenuItem.Click += new System.EventHandler(this.installTeleForAllDeviceToolStripMenuItem_Click);
             // 
-            // dataGridView1
-            // 
-            this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(818, 337);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(272, 238);
-            this.dataGridView1.TabIndex = 25;
-            // 
-            // btn_selectedLD
-            // 
-            this.btn_selectedLD.Location = new System.Drawing.Point(849, 297);
-            this.btn_selectedLD.Name = "btn_selectedLD";
-            this.btn_selectedLD.Size = new System.Drawing.Size(102, 23);
-            this.btn_selectedLD.TabIndex = 26;
-            this.btn_selectedLD.Text = "selected";
-            this.btn_selectedLD.UseVisualStyleBackColor = true;
-            this.btn_selectedLD.Click += new System.EventHandler(this.btn_selectedLD_Click);
-            // 
             // configForAllDeviceToolStripMenuItem
             // 
             this.configForAllDeviceToolStripMenuItem.Name = "configForAllDeviceToolStripMenuItem";
@@ -320,15 +360,17 @@
             this.configForAllDeviceToolStripMenuItem.Text = "config for all device";
             this.configForAllDeviceToolStripMenuItem.Click += new System.EventHandler(this.configForAllDeviceToolStripMenuItem_Click);
             // 
-            // btn_selectedAll
+            // addMoreInstanceToolStripMenuItem
             // 
-            this.btn_selectedAll.Location = new System.Drawing.Point(966, 297);
-            this.btn_selectedAll.Name = "btn_selectedAll";
-            this.btn_selectedAll.Size = new System.Drawing.Size(102, 23);
-            this.btn_selectedAll.TabIndex = 27;
-            this.btn_selectedAll.Text = "selected all";
-            this.btn_selectedAll.UseVisualStyleBackColor = true;
-            this.btn_selectedAll.Click += new System.EventHandler(this.btn_selectedAll_Click);
+            this.addMoreInstanceToolStripMenuItem.Name = "addMoreInstanceToolStripMenuItem";
+            this.addMoreInstanceToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
+            this.addMoreInstanceToolStripMenuItem.Text = "add more instance";
+            this.addMoreInstanceToolStripMenuItem.Click += new System.EventHandler(this.addMoreInstanceToolStripMenuItem_Click);
+            // 
+            // eixtToolStripMenuItem
+            // 
+            this.eixtToolStripMenuItem.Name = "eixtToolStripMenuItem";
+            this.eixtToolStripMenuItem.Size = new System.Drawing.Size(12, 20);
             // 
             // Form1
             // 
@@ -344,13 +386,13 @@
             this.Load += new System.EventHandler(this.Form1_Load);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dtgv_device_account)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -383,6 +425,9 @@
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.ToolStripMenuItem configForAllDeviceToolStripMenuItem;
         private System.Windows.Forms.Button btn_selectedAll;
+        private System.Windows.Forms.Button btn_ignoreLD;
+        private System.Windows.Forms.ToolStripMenuItem addMoreInstanceToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem eixtToolStripMenuItem;
     }
 }
 

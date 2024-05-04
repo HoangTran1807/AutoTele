@@ -80,23 +80,38 @@ namespace AutoTele
                     }
                     if (line.Contains("LDPLAYER_FOLDER_PATH"))
                     {
+
                         LDPLAYER_FOLDER_PATH = line.Split('=')[1];
-                        getListNameLDPlayer();
+                        if(!String.IsNullOrEmpty(LDPLAYER_FOLDER_PATH))
+                        {
+                            getListNameLDPlayer();
+                            txt_ldplayer_path.Text = LDPLAYER_FOLDER_PATH;
+                        }
                     }
                     if (line.Contains("CHAT_PATH"))
                     {
                         CHAT_PATH = line.Split('=')[1];
-                        LoadListChat();
+                        if(!String.IsNullOrEmpty (CHAT_PATH))
+                        {
+                            LoadListChat();
+                            txt_chatpath.Text = CHAT_PATH;
+                        }
                     }
                     if (line.Contains("GROUP_PATH"))
                     {
                         GROUP_PATH = line.Split('=')[1];
-                        LoadListGroup();
+                        if(!String.IsNullOrEmpty(GROUP_PATH))
+                        {
+                            LoadListGroup();
+                            txt_grouppath.Text = GROUP_PATH;
+                        }
+                                
                     }
                     if (line.Contains("THREAD_PER_ROUND"))
                     {
                         ThreadPerRound = Int32.Parse(line.Split('=')[1]);
                         ThreadPerRound = ThreadPerRound == 0 ? 2 : ThreadPerRound;
+                        numericUpDown1.Value = this.ThreadPerRound;
                     }
                 }
             }
@@ -221,6 +236,96 @@ namespace AutoTele
             ThreadPerRound = (int)numericUpDown1.Value;
         }
 
+        private void installTeleForAllDeviceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            if (ThreadPerRound == 0)
+            {
+                MessageBox.Show("Please input number of thread per round");
+                return;
+            }
+            // return if no device is selected
+            if (LDInstanceNames.Count == 0)
+            {
+                MessageBox.Show("Please select LDPlayer first!");
+                return;
+            }
+            Task.Run(() => InstallTeleForAll());
+        }
+
+        private void btn_selectedLD_Click(object sender, EventArgs e)
+        {
+            DataTable dt = new DataTable();
+            dt.Columns.Add("DeviceName");
+            SelectedLD.Clear();
+            foreach (DataGridViewRow row in dtgv_device_account.Rows)
+            {
+                // Kiểm tra xem dòng hiện tại có được chọn không
+                DataGridViewCheckBoxCell cell = row.Cells["Select"] as DataGridViewCheckBoxCell;
+                if (cell != null && cell.Value != null && (bool)cell.Value == true)
+                {
+                    // Lấy giá trị của cột "DeviceName" và in ra console
+                    SelectedLD.Add(row.Cells["DeviceName"].Value.ToString());
+                    dt.Rows.Add(row.Cells["DeviceName"].Value.ToString());
+                }
+            }
+            dataGridView1.DataSource = dt;
+        }
+
+        private void configForAllDeviceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+
+            foreach (String device in SelectedLD)
+            {
+                configForDriver(device);
+            }
+        }
+
+        private void btn_selectedAll_Click(object sender, EventArgs e)
+        {
+            DataTable dt = (DataTable)dtgv_device_account.DataSource;
+            if (dt != null)
+            {
+                foreach (DataRow row in dt.Rows)
+                {
+                    row["Select"] = true;
+                }
+            }
+
+            dataGridView1.DataSource = dt;
+            btn_selectedLD_Click(sender, e);
+        }
+
+        private void btn_ignoreLD_Click(object sender, EventArgs e)
+        {
+            DataTable dt = (DataTable)dtgv_device_account.DataSource;
+            if (dt != null)
+            {
+                foreach (DataRow row in dt.Rows)
+                {
+                    row["Select"] = false;
+                }
+            }
+
+            dataGridView1.DataSource = dt;
+            btn_selectedLD_Click(sender, e);
+        }
+
+        private void addMoreInstanceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(!BoolMessageBox("You want add 5 instance of LDPlayer"))
+                return;
+            for (int i = 0; i < 5; i++)
+            {
+                AddMoreInstance();
+
+            }
+            getListNameLDPlayer();
+        }
+
+        
+
         #endregion
 
         // ========================================== METHOD ==========================================
@@ -271,7 +376,7 @@ namespace AutoTele
             {
                 Console.WriteLine("Error reading file: " + e.Message);
             }
-            return null;
+            return new List<string>();
         }
 
         //private void button2_Click(object sender, EventArgs e)
@@ -397,12 +502,7 @@ namespace AutoTele
         {
             
             int deviceCount = SelectedLD.Count;
-            // return if no device is selected
-            if (deviceCount == 0)
-            {
-                MessageBox.Show("Please open LDPlayer first!");
-                return;
-            }
+            
 
             int numberOfRound = (int)Math.Ceiling((double)deviceCount / ThreadPerRound);
             isRunning = true;
@@ -504,118 +604,44 @@ namespace AutoTele
         {
 
             string targetDir = LDPLAYER_FOLDER_PATH; 
-            string command = "launchex --name " + device + " --packagename org.telegram.messenger.web"; 
+            string command = "launchex --name " + device + " --packagename org.telegram.messenger.web";
+            LDHelper.ExecuteCMD(LDPLAYER_FOLDER_PATH, command);
+        }
 
-            Process process = new Process();
-            process.StartInfo.FileName = targetDir + @"\ldconsole.exe";
-            process.StartInfo.Arguments = command;
-            process.StartInfo.WorkingDirectory = null;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.UseShellExecute = false;
-
-            process.Start();
-
-            StreamReader reader = process.StandardOutput;
-            string outputLine;
-            while ((outputLine = reader.ReadLine()) != null)
+        private bool BoolMessageBox(String info, String title = "")
+        {
+            var option = MessageBox.Show(info, title, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (option == DialogResult.Yes)
             {
-                Console.WriteLine(outputLine);
+                return true;
             }
-
-            process.WaitForExit();
-
-            if (process.ExitCode != 0)
-            {
-                Console.WriteLine("Error: Process exited with code " + process.ExitCode);
-            }
+            return false;
         }
 
         private void getListNameLDPlayer()
         {
-
-            try
+            LDInstanceNames.Clear();
+            string command = "list";
+            List<String> ldnames =  LDHelper.ExecuteCMD(LDPLAYER_FOLDER_PATH, command);
+            if(ldnames.Count > 0)
             {
-                
-                string targetDir = LDPLAYER_FOLDER_PATH;
-                string command = "list";
-
-                Process process = new Process();
-                process.StartInfo.FileName = targetDir + @"\ldconsole.exe";
-                process.StartInfo.Arguments = command;
-                process.StartInfo.WorkingDirectory = null;
-                process.StartInfo.RedirectStandardOutput = true;
-                process.StartInfo.UseShellExecute = false;
-
-                process.Start();
-
-                StreamReader reader = process.StandardOutput;
-                string outputLine;
-                LDInstanceNames.Clear();
-                while ((outputLine = reader.ReadLine()) != null)
+                foreach(String device in ldnames)
                 {
-                    LDInstanceNames.Add(outputLine);
-                }
-                RenderLDInstance();
-                process.WaitForExit();
-
-                if (process.ExitCode != 0)
-                {
-                    Console.WriteLine("Error: Process exited with code " + process.ExitCode);
+                    LDInstanceNames.Add(device);
+                    RenderLDInstance();
                 }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine("LDPlayer had not a instance take correct LDPlayer path");
-            }
+
         }
 
         private void closeAll()
         {
-            string targetDir = LDPLAYER_FOLDER_PATH;
             string command = "quitall";
-
-            Process process = new Process();
-            process.StartInfo.FileName = targetDir + @"\ldconsole.exe";
-            process.StartInfo.Arguments = command;
-            process.StartInfo.WorkingDirectory = null;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.UseShellExecute = false;
-
-            process.Start();
-
-            StreamReader reader = process.StandardOutput;
-            string outputLine;
-            while ((outputLine = reader.ReadLine()) != null)
-            {
-            }
-
-            process.WaitForExit();
-
-            if (process.ExitCode != 0)
-            {
-                Console.WriteLine("Error: Process exited with code " + process.ExitCode);
-            }
+            LDHelper.ExecuteCMD(LDPLAYER_FOLDER_PATH, command);
         }
 
 
-        private void RenderLDInstance()
-        {
-            DataTable dt = new DataTable();
-            dt.Columns.Add("DeviceName");
-            dt.Columns.Add("UserName");
-            dt.Columns.Add("Select", typeof(bool));
-
-            foreach (String device in LDInstanceNames)
-            {
-                DataRow row = dt.NewRow();
-                row["DeviceName"] = device;
-                row["UserName"] = "Hoang";
-                row["Select"] = false;
-                dt.Rows.Add(row);
-            }
-
-            dtgv_device_account.DataSource = dt;
-        }
+        
 
 
 
@@ -740,31 +766,39 @@ namespace AutoTele
             RenderGroup();
         }
 
-        public bool autoInstallTelegram(String deviceID)
+        public void RenderChat()
         {
-            string command = "adb -s " + deviceID + " install Telegram.apk";
 
-            String result = ExecuteCMD(command).Replace(command, "");
-            if (result.Contains("Success"))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            if (listChat.Count > 0)
+                foreach (String chat in listChat)
+                {
+                    rtxt_chats.AppendText(chat + "\n");
+                }
         }
 
-        public bool IsInstalledTelegram(String deviceID)
+        public void RenderGroup()
         {
-            string command = "adb -s " + deviceID + " shell pm list packages | findstr org.telegram.messenger.web";
+            if (listGr.Count > 0)
+                foreach (String group in listGr)
+                {
+                    rtxt_groups.AppendText(group + "\n");
+                }
+        }
+        private void RenderLDInstance()
+        {
+            DataTable dt = new DataTable();
+            dt.Columns.Add("DeviceName");
+            dt.Columns.Add("Select", typeof(bool));
 
-            String result = ExecuteCMD(command).Replace(command, "");
-            if (result.Contains("org.telegram.messenger.web"))
+            foreach (String device in LDInstanceNames)
             {
-                return true;
+                DataRow row = dt.NewRow();
+                row["DeviceName"] = device;
+                row["Select"] = false;
+                dt.Rows.Add(row);
             }
-            return false;
+
+            dtgv_device_account.DataSource = dt;
         }
 
         public String ExecuteCMD(string cmdCommand)
@@ -795,6 +829,29 @@ namespace AutoTele
             }
         }
 
+        public bool autoInstallTelegram(String deviceID)
+        {
+            string command = "adb -s " + deviceID + " install Telegram.apk";
+
+            String result = ExecuteCMD(command).Replace(command, "");
+            if (result.Contains("Success"))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public bool IsInstalledTelegram(String deviceID)
+        {
+            string command = "adb -s " + deviceID + " shell pm list packages | findstr org.telegram.messenger.web";
+
+            String result = ExecuteCMD(command).Replace(command, "");
+            if (result.Contains("org.telegram.messenger.web"))
+            {
+                return true;
+            }
+            return false;
+        }
 
         public void InstallTelegramForAllDevices()
         {
@@ -815,23 +872,30 @@ namespace AutoTele
             }
         }
 
-        public void RenderChat()
+        
+
+        private void configForDriver(String deviceID)
         {
-            if (listChat.Count > 0)
-                foreach (String chat in listChat)
-                {
-                    rtxt_chats.AppendText(chat + "\n");
-                }
+
+            string command = "modify --name " + deviceID + @" --resolution ""1080,1920,480"" --cpu 4 --memory 2048 --manufacturer samsung --model SM-G973N"; ;
+            LDHelper.ExecuteCMD(LDPLAYER_FOLDER_PATH, command);
+
         }
 
-        public void RenderGroup()
+        private void AddMoreInstance()
         {
-            if (listGr.Count > 0)
-                foreach (String group in listGr)
-                {
-                    rtxt_groups.AppendText(group + "\n");
-                }
+            string command = "add LDPlayer";
+            LDHelper.ExecuteCMD(LDPLAYER_FOLDER_PATH, command);
+            getListNameLDPlayer();
+            String lastDevice = LDInstanceNames.LastOrDefault();
+            if(lastDevice != null)
+            {
+                configForDriver(lastDevice);
+            }
         }
+
+
+
 
 
 
@@ -840,87 +904,5 @@ namespace AutoTele
 
         #endregion
 
-        private void installTeleForAllDeviceToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (ThreadPerRound == 0)
-            {
-                MessageBox.Show("Please input number of thread per round");
-                return;
-            }
-            Task.Run(() => InstallTeleForAll());
-        }
-
-        private void btn_selectedLD_Click(object sender, EventArgs e)
-        {
-            DataTable dt = new DataTable();
-            dt.Columns.Add("DeviceName");
-            SelectedLD.Clear();
-            foreach (DataGridViewRow row in dtgv_device_account.Rows)
-            {
-                // Kiểm tra xem dòng hiện tại có được chọn không
-                DataGridViewCheckBoxCell cell = row.Cells["Select"] as DataGridViewCheckBoxCell;
-                if (cell != null && cell.Value != null && (bool)cell.Value == true)
-                {
-                    // Lấy giá trị của cột "DeviceName" và in ra console
-                    SelectedLD.Add(row.Cells["DeviceName"].Value.ToString());
-                    dt.Rows.Add(row.Cells["DeviceName"].Value.ToString());
-                }
-            }
-            dataGridView1.DataSource = dt;
-        }
-
-        private void configForAllDeviceToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-            
-            foreach (String device in SelectedLD)
-            {
-                configForDriver(device);
-            }
-        }
-
-        private void configForDriver(String deviceID)
-        {
-
-            string targetDir = LDPLAYER_FOLDER_PATH;
-            string command = "modify --name " + deviceID + @" --resolution ""1080,1920,480"" --cpu 4 --memory 2048 --manufacturer samsung --model SM-G973N"; ;
-
-            Process process = new Process();
-            process.StartInfo.FileName = targetDir + @"\ldconsole.exe";
-            process.StartInfo.Arguments = command;
-            process.StartInfo.WorkingDirectory = null;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.UseShellExecute = false;
-
-            process.Start();
-
-            StreamReader reader = process.StandardOutput;
-            string outputLine;
-            while ((outputLine = reader.ReadLine()) != null)
-            {
-            }
-
-            process.WaitForExit();
-
-            if (process.ExitCode != 0)
-            {
-                Console.WriteLine("Error: Process exited with code " + process.ExitCode);
-            }
-        }
-
-        private void btn_selectedAll_Click(object sender, EventArgs e)
-        {
-            DataTable dt = (DataTable) dtgv_device_account.DataSource;
-            if (dt != null)
-            {
-                foreach (DataRow row in dt.Rows)
-                {
-                    row["Select"] = true;
-                }
-            }
-            
-            dataGridView1.DataSource = dt;
-            btn_selectedLD_Click(sender, e);
-        }
     }
 }
