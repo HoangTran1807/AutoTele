@@ -30,7 +30,6 @@ namespace AutoTele
         static bool isRunning = false;
 
         private static readonly Random random = new Random();
-
         Bitmap gr_chat = (Bitmap)Image.FromFile("data//gr_chat.png");
         Bitmap disablesend = (Bitmap)Image.FromFile("data//disablesend.png");
         Bitmap dropdown = (Bitmap)Image.FromFile("data//dropdown.png");
@@ -54,7 +53,7 @@ namespace AutoTele
         #endregion
 
         #region CountDown
-        int TIME_WAIT_DRIVER = 12; // 12 * 10000
+        int TIME_WAIT_DRIVER = 7; // 12 * 10000
         int TIME_WAIT_TELEGRAM = 10; // 10 * 10000
         #endregion
 
@@ -158,6 +157,12 @@ namespace AutoTele
                 MessageBox.Show("Please input number of thread per round");
                 return;
             }
+            // return if no device is selected
+            if (SelectedLD.Count == 0)
+            {
+                MessageBox.Show("Please select LDPlayer first!");
+                return;
+            }
             Task.Run(() => startMultiThread());
         }
         private void btn_end_Click(object sender, EventArgs e)
@@ -246,7 +251,7 @@ namespace AutoTele
                 return;
             }
             // return if no device is selected
-            if (LDInstanceNames.Count == 0)
+            if (SelectedLD.Count == 0)
             {
                 MessageBox.Show("Please select LDPlayer first!");
                 return;
@@ -265,7 +270,6 @@ namespace AutoTele
                 DataGridViewCheckBoxCell cell = row.Cells["Select"] as DataGridViewCheckBoxCell;
                 if (cell != null && cell.Value != null && (bool)cell.Value == true)
                 {
-                    // Lấy giá trị của cột "DeviceName" và in ra console
                     SelectedLD.Add(row.Cells["DeviceName"].Value.ToString());
                     dt.Rows.Add(row.Cells["DeviceName"].Value.ToString());
                 }
@@ -371,11 +375,11 @@ namespace AutoTele
             }
             catch (FileNotFoundException e)
             {
-                Console.WriteLine("Error: File not found - " + dir);
+                rtxt_console.AppendText("Error: File not found - " + dir);
             }
             catch (Exception e)
             {
-                Console.WriteLine("Error reading file: " + e.Message);
+                rtxt_console.AppendText("Error reading file: ");
             }
             return new List<string>();
         }
@@ -409,18 +413,17 @@ namespace AutoTele
         private async void startMultiThread()
         {
             int deviceCount = SelectedLD.Count;
-            // return if no device is selected
-            if (deviceCount == 0)
-            {
-                MessageBox.Show("Please open LDPlayer first!");
-                return;
-            }
+
 
             int numberOfRound = (int) Math.Ceiling((double)deviceCount / ThreadPerRound);
             isRunning = true;
 
             for (int i = 0; i < numberOfRound; i++)
             {
+                this.Invoke((MethodInvoker)delegate
+                {
+                    btn_Start.Enabled = false;
+                });
                 // exit if stop button is clicked
                 if (!isRunning)
                 {
@@ -452,8 +455,11 @@ namespace AutoTele
                         break;
                     }
                     devices = KAutoHelper.ADBHelper.GetDevices();
-                    Thread.Sleep(10000);
-                    Console.WriteLine("Waiting for devices all device online");
+                    Thread.Sleep(20000);
+                    this.Invoke((MethodInvoker)delegate
+                    {
+                        rtxt_console.AppendText("Waiting for devices all device online! \n");
+                    });
                     count++;
                 }
 
@@ -471,11 +477,7 @@ namespace AutoTele
                             rtxt_console.AppendText(device + " is running...\n");
                         });
                         // Run dosomething on a different thread
-                        var result = dosomething(device);
-                        this.Invoke((MethodInvoker)delegate
-                        {
-                            rtxt_console.AppendText(device + " do " + result + "\n");
-                        });
+                        AutoJoinGr_Chat(device, 0, 1, true);
 
 
                         this.Invoke((MethodInvoker)delegate
@@ -497,6 +499,7 @@ namespace AutoTele
             });
 
             closeAll();
+            btn_Start.Enabled = true;
         }
 
         private async void InstallTeleForAll()
@@ -541,8 +544,12 @@ namespace AutoTele
                         break;
                     }
                     devices = KAutoHelper.ADBHelper.GetDevices();
-                    Thread.Sleep(10000);
-                    Console.WriteLine("Waiting for devices all device online");
+                    Thread.Sleep(20000);
+
+                    this.Invoke((MethodInvoker)delegate
+                    {
+                        rtxt_console.AppendText("Waiting for devices all device online! \n");
+                    });
                     count++;
                 }
                 
@@ -555,7 +562,10 @@ namespace AutoTele
                     // run if device is not installed telegram
                     tasks.Add(Task.Run(() =>
                     {
-                        Console.WriteLine(device + "is online");
+                        this.Invoke((MethodInvoker)delegate
+                        {
+                            rtxt_console.AppendText(device + "is online\n");
+                        });
                         if(!IsInstalledTelegram(device))
                         {
                             int ncount = 0;
@@ -642,7 +652,7 @@ namespace AutoTele
         }
 
 
-        
+
 
 
 
@@ -697,8 +707,8 @@ namespace AutoTele
             int indexchat = rand.Next(0, listChat.Count);
 
             // Lấy phần tử tại chỉ mục đã chọn
-            string choosegr = listChat[indexgr];
-            string choosechat = listGr[indexchat];
+            string choosegr = listGr[indexgr];
+            string choosechat = listChat[indexchat];
 
 
             KAutoHelper.ADBHelper.InputText(deviceID, choosegr);
@@ -709,7 +719,7 @@ namespace AutoTele
             Point? checkgr_chat = task1.FindOutPoint(screen4, gr_chat);
 
 
-            if (checkgr_chat != null )
+            if (checkgr_chat != null)
             {
                 task1.clickChildImage(gr_chat, deviceID);
                 KAutoHelper.ADBHelper.Delay(7000);
@@ -738,13 +748,17 @@ namespace AutoTele
                     KAutoHelper.ADBHelper.Tap(deviceID, 71, 155);
                     this.Invoke((MethodInvoker)delegate
                     {
-                        rtxt_console.AppendText(device + " is not installed...\n");
+                        rtxt_console.AppendText(deviceID + " send: `" + choosechat + "` in `" + choosegr + "`\n");
                     });
                     KAutoHelper.ADBHelper.Delay(random.Next(120000, 300000));
                     AutoJoinGr_Chat(deviceID, i + 1, numberAcc, false);
                 }
                 else
                 {
+                    this.Invoke((MethodInvoker)delegate
+                    {
+                        rtxt_console.AppendText(deviceID + ": cant not chat in gr `" + choosegr + "`\n");
+                    });
                     KAutoHelper.ADBHelper.Delay(random.Next(1000, 2000));
                     KAutoHelper.ADBHelper.Tap(deviceID, 71, 155);
                     KAutoHelper.ADBHelper.Delay(random.Next(1000, 2000));
@@ -754,6 +768,10 @@ namespace AutoTele
             }
             else
             {
+                this.Invoke((MethodInvoker)delegate
+                {
+                    rtxt_console.AppendText(deviceID + " cant find gr `" + choosegr + "`\n");
+                });
                 Console.WriteLine("Cannot click on the gr_chat icon");
                 KAutoHelper.ADBHelper.Tap(deviceID, 71, 155);
                 KAutoHelper.ADBHelper.Delay(random.Next(1000, 2000));
@@ -911,6 +929,5 @@ namespace AutoTele
 
 
         #endregion
-
     }
 }

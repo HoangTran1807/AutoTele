@@ -2,4 +2,4 @@ ADB_FOLDER_PATH=
 LDPLAYER_FOLDER_PATH=C:\LDPlayer\LDPlayer9
 CHAT_PATH=C:\Users\Admin\Desktop\chat.txt
 GROUP_PATH=C:\Users\Admin\Desktop\chat.txt
-THREAD_PER_ROUND=2
+THREAD_PER_ROUND=4
