@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using ZedGraph;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Menu;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
 
@@ -730,10 +731,15 @@ namespace AutoTele
                     KAutoHelper.ADBHelper.Tap(deviceID, 276, 1855);
                     KAutoHelper.ADBHelper.Delay(random.Next(1000, 2000));
                     KAutoHelper.ADBHelper.InputText(deviceID, choosechat);
+
                     KAutoHelper.ADBHelper.Delay(random.Next(1000, 2000));
                     KAutoHelper.ADBHelper.Tap(deviceID, 1004, 1842);
                     KAutoHelper.ADBHelper.Delay(random.Next(1000, 2000));
                     KAutoHelper.ADBHelper.Tap(deviceID, 71, 155);
+                    this.Invoke((MethodInvoker)delegate
+                    {
+                        rtxt_console.AppendText(device + " is not installed...\n");
+                    });
                     KAutoHelper.ADBHelper.Delay(random.Next(120000, 300000));
                     AutoJoinGr_Chat(deviceID, i + 1, numberAcc, false);
                 }
@@ -749,6 +755,8 @@ namespace AutoTele
             else
             {
                 Console.WriteLine("Cannot click on the gr_chat icon");
+                KAutoHelper.ADBHelper.Tap(deviceID, 71, 155);
+                KAutoHelper.ADBHelper.Delay(random.Next(1000, 2000));
                 AutoJoinGr_Chat(deviceID, i + 1, numberAcc, false);
             }
         }
