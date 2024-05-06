@@ -121,3 +121,4 @@ C:\Users\Admin\Desktop\tooltele\AutoTele\AutoTele\obj\Debug\AutoTele.csproj.Core
 C:\Users\Admin\Desktop\tooltele\AutoTele\AutoTele\obj\Debug\AutoTele.csproj.Up2Date
 C:\Users\Admin\Desktop\tooltele\AutoTele\AutoTele\obj\Debug\AutoTele.exe
 C:\Users\Admin\Desktop\tooltele\AutoTele\AutoTele\obj\Debug\AutoTele.pdb
+C:\Hoang\DotNet\AutoTele2\AutoTele\AutoTele\obj\Debug\AutoTele.PathSelector.resources

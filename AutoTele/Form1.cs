@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -11,6 +12,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -51,10 +53,11 @@ namespace AutoTele
         String LDPLAYER_FOLDER_PATH = "";
         String CHAT_PATH = "";
         String GROUP_PATH = "";
+        public static String TelePath = "";
         #endregion
 
         #region CountDown
-        int TIME_WAIT_DRIVER = 7; // 12 * 10000
+        int TIME_WAIT_DRIVER = 10; // 12 * 10000
         int TIME_WAIT_TELEGRAM = 10; // 10 * 10000
         #endregion
 
@@ -63,7 +66,7 @@ namespace AutoTele
         public Form1()
         {
             InitializeComponent();
-            
+            StartPosition = FormStartPosition.CenterScreen;
         }
 
         public void startUp()
@@ -258,6 +261,25 @@ namespace AutoTele
                 return;
             }
             Task.Run(() => InstallTeleForAll());
+
+            //PathSelector sl = new PathSelector();
+            //sl.ShowDialog();
+            //if(String.IsNullOrEmpty(TelePath))
+            //{
+            //    MessageBox.Show("Please choose telegram path");
+            //    return;
+            //}
+
+            //foreach(String device in SelectedLD)
+            //{
+            //    installTele(device, TelePath);
+            //}
+        }
+
+        private void installTele(String device, String path)
+        {
+            String command = "installapp --name " + device + " --filename "+path;
+            LDHelper.ExecuteCMD(LDPLAYER_FOLDER_PATH, command);
         }
 
         private void btn_selectedLD_Click(object sender, EventArgs e)
@@ -327,7 +349,6 @@ namespace AutoTele
                 AddMoreInstance();
 
             }
-            getListNameLDPlayer();
         }
 
         
@@ -500,7 +521,10 @@ namespace AutoTele
             });
 
             closeAll();
-            btn_Start.Enabled = true;
+            this.Invoke((MethodInvoker)delegate
+            {
+                btn_Start.Enabled = true;
+            });
         }
 
         private async void InstallTeleForAll()
@@ -670,8 +694,9 @@ namespace AutoTele
             //check so lan chat của từng tai khoan
             if (i >= 4)
             {
-                AutoJoinGr_Chat(deviceID, 0, numberAcc + 1, true);
                 return;
+                //AutoJoinGr_Chat(deviceID, 0, numberAcc + 1, true);
+                //return;
             }
             proc task1 = new proc();
 
@@ -915,14 +940,66 @@ namespace AutoTele
 
         private void AddMoreInstance()
         {
+            String directoryPath = LDPLAYER_FOLDER_PATH + @"\vms\config";
+            List<String> befor = GetFileNames(directoryPath);
             string command = "add LDPlayer";
             LDHelper.ExecuteCMD(LDPLAYER_FOLDER_PATH, command);
+            List<String> after = GetFileNames(directoryPath);
             getListNameLDPlayer();
             String lastDevice = LDInstanceNames.LastOrDefault();
             if(lastDevice != null)
             {
                 configForDriver(lastDevice);
+                String newldpath = LDPLAYER_FOLDER_PATH + @"\vms\config\" + GetDifferent(befor, after);
+                editConfig(newldpath);
             }
+        }
+
+        public string GetDifferent(List<String> before, List<String> after)
+        {
+            HashSet<string> hashSet1 = new HashSet<string>(before);
+            HashSet<string> hashSet2 = new HashSet<string>(after);
+
+            IEnumerable<string> distinctElements = hashSet2.Except(hashSet1);
+            return distinctElements.First();
+        }
+
+        public List<string> GetFileNames(String directoryPath)
+        {
+            
+            // Check if directory exists
+            if (!Directory.Exists(directoryPath))
+            {
+                throw new DirectoryNotFoundException($"Directory not found: {directoryPath}");
+            }
+
+            // Get all file names (including paths)
+            string[] filePaths = Directory.GetFiles(directoryPath);
+
+            // Extract just the file names (optional)
+            List<string> fileNames = new List<string>();
+            foreach (string filePath in filePaths)
+            {
+                string fileName = Path.GetFileName(filePath);
+                fileNames.Add(fileName);
+            }
+            return fileNames;
+        }
+        
+
+        public void editConfig(String path)
+        {
+            
+
+            String config = @"basicSettings.adbDebug";
+            String json = File.ReadAllText(path);
+            if(json.Contains(config))
+            {
+                return;
+            }
+            Dictionary<String, object> jsonObj = JsonConvert.DeserializeObject<Dictionary<String, object>>(json);
+            jsonObj.Add("basicSettings.adbDebug", 1);
+            File.WriteAllText(path, JsonConvert.SerializeObject(jsonObj));
         }
 
 
@@ -931,8 +1008,7 @@ namespace AutoTele
 
 
 
-
-
         #endregion
+
     }
 }
