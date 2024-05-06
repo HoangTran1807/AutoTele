@@ -34,6 +34,7 @@ namespace AutoTele
         Bitmap disablesend = (Bitmap)Image.FromFile("data//disablesend.png");
         Bitmap dropdown = (Bitmap)Image.FromFile("data//dropdown.png");
         Bitmap login = (Bitmap)Image.FromFile("data//login.png");
+        Bitmap icon = (Bitmap)Image.FromFile("data//icon.png");
 
         List<String> LDInstanceNames = new List<string>();
         List<String> SelectedLD = new List<string>();
@@ -695,7 +696,16 @@ namespace AutoTele
                     default:
                         return;
                 }
-                KAutoHelper.ADBHelper.Delay(2000);
+
+               
+                KAutoHelper.ADBHelper.Delay(9000);
+
+                Bitmap screen1 = KAutoHelper.ADBHelper.ScreenShoot(deviceID);
+                Point? checklogin = task1.FindOutPoint(screen1, login);
+                if (checklogin != null)
+                {
+                    return;
+                }
             }
             KAutoHelper.ADBHelper.Tap(deviceID, 998, 145);
 
@@ -715,68 +725,63 @@ namespace AutoTele
             KAutoHelper.ADBHelper.Delay(10000);
             // tìm gr chat 
 
-            Bitmap screen4 = KAutoHelper.ADBHelper.ScreenShoot(deviceID);
-            Point? checkgr_chat = task1.FindOutPoint(screen4, gr_chat);
+            //Bitmap screen4 = KAutoHelper.ADBHelper.ScreenShoot(deviceID);
+            //Point? checkgr_chat = task1.FindOutPoint(screen4, gr_chat);
 
+            //if (checkgr_chat != null)
+            //{
+            //task1.clickChildImage(gr_chat, deviceID);
+            KAutoHelper.ADBHelper.Tap(deviceID, 497, 567);
+            KAutoHelper.ADBHelper.Delay(10000);
 
-            if (checkgr_chat != null)
+ 
+            KAutoHelper.ADBHelper.Delay(2000);
+            KAutoHelper.ADBHelper.Tap(deviceID, 530, 1852);
+            KAutoHelper.ADBHelper.Delay(10000);
+            Bitmap screen2 = KAutoHelper.ADBHelper.ScreenShoot(deviceID);
+            Point? checkicon = task1.FindOutPoint(screen2, icon);
+            if (checkicon != null)
             {
-                task1.clickChildImage(gr_chat, deviceID);
-                KAutoHelper.ADBHelper.Delay(7000);
-                Bitmap screen1 = KAutoHelper.ADBHelper.ScreenShoot(deviceID);
-                Point? checklogin = task1.FindOutPoint(screen1, login);
-                if (checklogin != null)
-                {
-                    return;
-                }
-                Console.WriteLine("Click on the gr_chat icon");
-                KAutoHelper.ADBHelper.Delay(2000);
-                KAutoHelper.ADBHelper.Tap(deviceID, 530, 1852);
-                KAutoHelper.ADBHelper.Delay(10000);
-                Bitmap screen2 = KAutoHelper.ADBHelper.ScreenShoot(deviceID);
-                Point? checkdisable = task1.FindOutPoint(screen2, disablesend);
-                if (checkdisable == null)
-                {
-                    KAutoHelper.ADBHelper.Delay(random.Next(10000, 30001));
-                    KAutoHelper.ADBHelper.Tap(deviceID, 276, 1855);
-                    KAutoHelper.ADBHelper.Delay(random.Next(1000, 2000));
-                    KAutoHelper.ADBHelper.InputText(deviceID, choosechat);
+                KAutoHelper.ADBHelper.Delay(random.Next(10000, 30001));
+                KAutoHelper.ADBHelper.Tap(deviceID, 276, 1855);
+                KAutoHelper.ADBHelper.Delay(random.Next(1000, 2000));
+                KAutoHelper.ADBHelper.InputText(deviceID, choosechat);
 
-                    KAutoHelper.ADBHelper.Delay(random.Next(1000, 2000));
-                    KAutoHelper.ADBHelper.Tap(deviceID, 1004, 1842);
-                    KAutoHelper.ADBHelper.Delay(random.Next(1000, 2000));
-                    KAutoHelper.ADBHelper.Tap(deviceID, 71, 155);
-                    this.Invoke((MethodInvoker)delegate
-                    {
-                        rtxt_console.AppendText(deviceID + " send: `" + choosechat + "` in `" + choosegr + "`\n");
-                    });
-                    KAutoHelper.ADBHelper.Delay(random.Next(120000, 300000));
-                    AutoJoinGr_Chat(deviceID, i + 1, numberAcc, false);
-                }
-                else
+                KAutoHelper.ADBHelper.Delay(random.Next(1000, 2000));
+                KAutoHelper.ADBHelper.Tap(deviceID, 1004, 1842);
+                KAutoHelper.ADBHelper.Delay(random.Next(1000, 2000));
+                KAutoHelper.ADBHelper.Tap(deviceID, 71, 155);
+                this.Invoke((MethodInvoker)delegate
                 {
-                    this.Invoke((MethodInvoker)delegate
-                    {
-                        rtxt_console.AppendText(deviceID + ": cant not chat in gr `" + choosegr + "`\n");
-                    });
-                    KAutoHelper.ADBHelper.Delay(random.Next(1000, 2000));
-                    KAutoHelper.ADBHelper.Tap(deviceID, 71, 155);
-                    KAutoHelper.ADBHelper.Delay(random.Next(1000, 2000));
-                    AutoJoinGr_Chat(deviceID, i + 1, numberAcc, false);
-                }
-
+                    rtxt_console.AppendText(deviceID + " send: `" + choosechat + "` in `" + choosegr + "`\n");
+                });
+                KAutoHelper.ADBHelper.Delay(random.Next(120000, 300000));
+                AutoJoinGr_Chat(deviceID, i + 1, numberAcc, false);
             }
             else
             {
                 this.Invoke((MethodInvoker)delegate
                 {
-                    rtxt_console.AppendText(deviceID + " cant find gr `" + choosegr + "`\n");
+                    rtxt_console.AppendText(deviceID + ": cant not chat in gr `" + choosegr + "`\n");
                 });
-                Console.WriteLine("Cannot click on the gr_chat icon");
+                KAutoHelper.ADBHelper.Delay(random.Next(1000, 2000));
                 KAutoHelper.ADBHelper.Tap(deviceID, 71, 155);
                 KAutoHelper.ADBHelper.Delay(random.Next(1000, 2000));
                 AutoJoinGr_Chat(deviceID, i + 1, numberAcc, false);
             }
+
+            //}
+            //else
+            //{
+            //    this.Invoke((MethodInvoker)delegate
+            //    {
+            //        rtxt_console.AppendText(deviceID + " cant find gr `" + choosegr + "`\n");
+            //    });
+            //    Console.WriteLine("Cannot click on the gr_chat icon");
+            //    KAutoHelper.ADBHelper.Tap(deviceID, 71, 155);
+            //    KAutoHelper.ADBHelper.Delay(random.Next(1000, 2000));
+            //    AutoJoinGr_Chat(deviceID, i + 1, numberAcc, false);
+            //}
         }
 
 
